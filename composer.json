@@ -8,7 +8,7 @@
         "graphp/graphviz": "^0.2"
     },
     "require-dev": {
-        "crysalead/kahlan": "^2.5"
+        "crysalead/kahlan": "^2.5.4"
     },
     "license": "MIT",
     "authors": [
