@@ -6,7 +6,9 @@ require_once __DIR__.'/../vendor/autoload.php';
 
 describe('Reading configuration', function () {
     it('should check if file exists', function () {
-        expect(function () { readConfiguration(uniqid()); })
+        expect(function () {
+            readConfiguration(uniqid());
+        })
             ->toThrow(new InvalidArgumentException());
     });
 
@@ -16,7 +18,9 @@ describe('Reading configuration', function () {
     });
 
     it('should report if YAML is invalid', function () {
-        expect(function () {  readConfiguration(__DIR__.'/fixtures/read-configuration/invalid.json'); })
+        expect(function () {
+            readConfiguration(__DIR__.'/fixtures/read-configuration/invalid.json');
+        })
             ->toThrow(new InvalidArgumentException());
     });
 });

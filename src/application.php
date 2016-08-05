@@ -84,7 +84,6 @@ $application->register('render')
                 $renderer->display($graph);
                 break;
         }
-
     });
 
 $application->run();
