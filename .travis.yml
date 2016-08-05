@@ -1,0 +1,17 @@
+language: php
+
+php:
+    - 7.0
+    - nightly
+
+env:
+    matrix:
+        - COMPOSERFLAGS="--prefer-stable"
+        - COMPOSERFLAGS="--prefer-lowest"
+
+matrix:
+    allow_failures:
+        - php: nightly
+
+script:
+    - make test
