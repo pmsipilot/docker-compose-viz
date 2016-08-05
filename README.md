@@ -3,12 +3,6 @@
 [![Build Status](https://travis-ci.org/pmsipilot/docker-compose-viz.svg?branch=master)](https://travis-ci.org/pmsipilot/docker-compose-viz)
 
 ## How to use
-
-Before you start, make sure you have:
-
-* [Composer](https://getcomposer.org/doc/00-intro.md#installation-linux-unix-osx) installed,
-* [PHP 7](http://php.net/downloads.php#v7.0.9) installed,
-* GraphViz installed (see below for a guide on how to install it)
      
 ### Docker
 
@@ -17,6 +11,12 @@ docker run --rm -it --name dcv -v $(pwd):/input pmsipilot/docker-compose-viz
 ```
 
 ### PHP
+
+Before you start, make sure you have:
+
+* [Composer](https://getcomposer.org/doc/00-intro.md#installation-linux-unix-osx) installed,
+* [PHP 7](http://php.net/downloads.php#v7.0.9) installed,
+* GraphViz installed (see below for a guide on how to install it)
 
 ```
 git clone https://github.com/pmsipilot/docker-compose-viz.git
@@ -28,7 +28,7 @@ composer install --prefer-dist
 bin/dcv
 ```
 
-### Install GraphViz
+#### Install GraphViz
 
 * On MacOS: `brew install graphviz`
 * On Debian: `sudo apt-get install graphviz`
