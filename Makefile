@@ -17,7 +17,7 @@ unit: vendor
 cs:
 	$(PHP) bin/php-cs-fixer fix --dry-run
 
-fix-cs
+fix-cs:
 	$(PHP) bin/php-cs-fixer fix
 
 clean:

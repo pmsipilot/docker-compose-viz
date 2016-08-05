@@ -1,6 +1,7 @@
 # `docker-compose-viz` 
 
-[![Build Status](https://travis-ci.org/pmsipilot/docker-compose-viz.svg?branch=master)](https://travis-ci.org/pmsipilot/docker-compose-viz)
+[![Build Status](https://travis-ci.org/pmsipilot/docker-compose-viz.svg?branch=master)](https://travis-ci.org/pmsipilot/docker-compose-viz) [![StyleCI](https://styleci.io/repos/65026022/shield)](https://styleci.io/repos/65026022)
+
 
 ## How to use
      
