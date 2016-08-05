@@ -10,7 +10,7 @@ PHP ?= php
 docker: docker.lock
 
 test: vendor
-	$(PHP) bin/kahlan --pattern='*.php' --reporter=verbose
+	$(PHP) bin/kahlan --pattern='*.php' --reporter=verbose --persistent=false --cc=true
 
 clean:
 	rm -rf vendor/
