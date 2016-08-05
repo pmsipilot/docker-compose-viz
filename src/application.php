@@ -4,21 +4,17 @@ namespace PMSIpilot\DockerComposeViz;
 
 use Graphp\GraphViz\GraphViz;
 use Symfony\Component\Console;
-use Symfony\Component\Yaml\Yaml;
-
-use function PMSIpilot\DockerComposeViz\{
-    readConfiguration,
-    fetchServices,
-    fetchVolumes,
-    fetchNetworks,
-    createGraph,
-    applyGraphvizStyle
-};
+use function PMSIpilot\DockerComposeViz\readConfiguration;
+use function PMSIpilot\DockerComposeViz\fetchServices;
+use function PMSIpilot\DockerComposeViz\fetchVolumes;
+use function PMSIpilot\DockerComposeViz\fetchNetworks;
+use function PMSIpilot\DockerComposeViz\createGraph;
+use function PMSIpilot\DockerComposeViz\applyGraphvizStyle;
 
 $application = new Console\Application();
 
 $application->register('render')
-    ->addArgument('input-file',Console\Input\InputArgument::OPTIONAL, 'Path to a docker compose file', getcwd().DIRECTORY_SEPARATOR.'docker-compose.yml')
+    ->addArgument('input-file', Console\Input\InputArgument::OPTIONAL, 'Path to a docker compose file', getcwd().DIRECTORY_SEPARATOR.'docker-compose.yml')
 
     ->addOption('output-file', 'o', Console\Input\InputOption::VALUE_REQUIRED, 'Path to a output file (Only for "dot" and "image" output format)')
     ->addOption('output-format', 'm', Console\Input\InputOption::VALUE_REQUIRED, 'Output format (one of: "dot", "image", "display")', 'display')
@@ -28,7 +24,7 @@ $application->register('render')
     ->addOption('no-volumes', null, Console\Input\InputOption::VALUE_NONE, 'Do not display volumes')
     ->addOption('horizontal', 'r', Console\Input\InputOption::VALUE_NONE, 'Display a horizontal graph')
 
-    ->setCode(function(Console\Input\InputInterface $input, Console\Output\OutputInterface $output) {
+    ->setCode(function (Console\Input\InputInterface $input, Console\Output\OutputInterface $output) {
         $inputFile = $input->getArgument('input-file');
         $outputFormat = $input->getOption('output-format');
         $outputFile = $input->getOption('output-file') ?: getcwd().DIRECTORY_SEPARATOR.'docker-compose.'.($outputFormat === 'dot' ? $outputFormat : 'png');
@@ -62,7 +58,7 @@ $application->register('render')
 
             $services = array_filter(
                 $services,
-                function($service) use ($onlyServices) {
+                function ($service) use ($onlyServices) {
                     return in_array($service, $onlyServices);
                 },
                 ARRAY_FILTER_USE_KEY
@@ -77,7 +73,7 @@ $application->register('render')
         switch ($outputFormat) {
             case 'dot':
             case 'image':
-                $rendererClass = 'Graphp\GraphViz\\' . ucfirst($outputFormat);
+                $rendererClass = 'Graphp\GraphViz\\'.ucfirst($outputFormat);
                 $renderer = new $rendererClass();
 
                 file_put_contents($outputFile, $renderer->getOutput($graph));

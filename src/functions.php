@@ -76,7 +76,6 @@ function fetchNetworks(array $configuration) : array
     return $configuration['networks'] ?? [];
 }
 
-
 /**
  * @public
  *
@@ -338,8 +337,8 @@ function addPort(Graph $graph, int $port, string $proto = null)
 /**
  * @internal
  *
- * @param Graph       $graph Input graph
- * @param string      $path  Path
+ * @param Graph  $graph Input graph
+ * @param string $path  Path
  *
  * @return Vertex
  */
@@ -358,9 +357,9 @@ function addVolume(Graph $graph, string $path)
 /**
  * @internal
  *
- * @param Graph       $graph Input graph
- * @param string      $name  Name of the network
- * @param string      $type  Network type
+ * @param Graph  $graph Input graph
+ * @param string $name  Name of the network
+ * @param string $type  Network type
  *
  * @return Vertex
  */

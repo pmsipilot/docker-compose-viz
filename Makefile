@@ -5,12 +5,20 @@ COMPOSERFLAGS ?=
 DOCKER ?= docker
 PHP ?= php
 
-.PHONY: clean docker test
+.PHONY: clean docker test unit cs fix-cs
 
 docker: docker.lock
 
-test: vendor
+test: vendor unit cs
+
+unit: vendor
 	$(PHP) bin/kahlan --pattern='*.php' --reporter=verbose --persistent=false --cc=true
+
+cs:
+	$(PHP) bin/php-cs-fixer fix --dry-run
+
+fix-cs
+	$(PHP) bin/php-cs-fixer fix
 
 clean:
 	rm -rf vendor/
