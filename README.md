@@ -114,7 +114,7 @@ If we look at the link between `mysql` and `db`, it reads as follow: "`mysql` ex
 
 Networks (from `networks.<network>`) are displayed as pentagon. The links between them and services are displayed as plain arrows pointing to the network:
 
-![netowrks](resources/extends.png)
+![netowrks](resources/netowrks.png)
 
 If we look at the link between `mysql` and the `global` network, it reads as follow: "`mysql` is known as `mysql`, `db` and `reldb` in the `global` network.
 
