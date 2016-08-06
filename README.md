@@ -66,6 +66,10 @@ Links (from `services.<service>.links`) are displayed as plain arrows pointing t
 If we look at the link between `mysql` and `ambassador`, it reads as follow: "`mysql` is known as `mysql` in `ambassador`."
 If we look at the link between `ambassador` and `logs`, it reads as follow: "`ambassador` is known as `logstash` in `logs`."
 
+External links are displayed using the same shapes but are grayed:
+
+![external_links](resources/external_links.png)
+
 ### Volumes
 
 Volumes (from `services.<service>.volumes_from`) are displayed as dashed arrows pointing to the service that uses the volumes:
@@ -99,12 +103,22 @@ If we look at the link between port `2580` and `elk`, it reads as follow: "traff
 
 ### Extends
 
-Extended services (from `services.<service>.extends`) are displayed as components (just like normal services). The link between them and the extending services are 
+Extended services (from `services.<service>.extends`) are displayed as components (just like normal services). The links between them and the extending services are 
 displayed as inverted arrows:
 
-![ports](resources/extends.png)
+![extends](resources/extends.png)
 
 If we look at the link between `mysql` and `db`, it reads as follow: "`mysql` extends  service `db`".
+
+### Networks
+
+Networks (from `networks.<network>`) are displayed as pentagon. The links between them and services are displayed as plain arrows pointing to the network:
+
+![netowrks](resources/extends.png)
+
+If we look at the link between `mysql` and the `global` network, it reads as follow: "`mysql` is known as `mysql`, `db` and `reldb` in the `global` network.
+
+The `legacy` network is an external so it's displayed as a grayed pentagone.
 
 ## Examples
 
