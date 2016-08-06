@@ -66,7 +66,7 @@ $application->register('render')
         }
 
         $graph = applyGraphvizStyle(
-            createGraph($services, $volumes, $networks, $input->getOption('no-volumes') === false),
+            createGraph($services, $volumes, $networks, $input->getOption('no-volumes') === false, $inputFile),
             $input->getOption('horizontal')
         );
 

@@ -1,5 +1,6 @@
 # `1.0.0` (unreleased)
 
+* Display extended services as components with inverted arrows
 * Display services as components
 * Display volumes as folders
 * Display ports as circles

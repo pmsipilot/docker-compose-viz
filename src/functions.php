@@ -79,16 +79,17 @@ function fetchNetworks(array $configuration) : array
 /**
  * @public
  *
- * @param array $services    Docker compose service definitions
- * @param array $volumes     Docker compose volume definitions
- * @param array $networks    Docker compose network definitions
- * @param bool  $withVolumes Create vertices and edges for volumes
+ * @param array  $services    Docker compose service definitions
+ * @param array  $volumes     Docker compose volume definitions
+ * @param array  $networks    Docker compose network definitions
+ * @param bool   $withVolumes Create vertices and edges for volumes
+ * @param string $path        Path of the current docker-compose configuration file
  *
  * @return Graph The complete graph for the given list of services
  */
-function createGraph(array $services, array $volumes, array $networks, bool $withVolumes = true) : Graph
+function createGraph(array $services, array $volumes, array $networks, bool $withVolumes, string $path) : Graph
 {
-    return makeVerticesAndEdges(new Graph(), $services, $volumes, $networks, $withVolumes);
+    return makeVerticesAndEdges(new Graph(), $services, $volumes, $networks, $withVolumes, $path);
 }
 
 /**
@@ -103,6 +104,7 @@ function applyGraphvizStyle(Graph $graph, bool $horizontal) : Graph
 {
     $graph = $graph->createGraphClone();
     $graph->setAttribute('graphviz.graph.pad', '0.5');
+    $graph->setAttribute('graphviz.graph.ratio', 'fill');
 
     if ($horizontal === true) {
         $graph->setAttribute('graphviz.graph.rankdir', 'LR');
@@ -162,6 +164,12 @@ function applyGraphvizStyle(Graph $graph, bool $horizontal) : Graph
             case 'depends_on':
                 $edge->setAttribute('graphviz.style', 'dotted');
                 break;
+
+            case 'extends':
+                $edge->setAttribute('graphviz.dir', 'both');
+                $edge->setAttribute('graphviz.arrowhead', 'inv');
+                $edge->setAttribute('graphviz.arrowtail', 'dot');
+                break;
         }
 
         if (($alias = $edge->getAttribute('docker_compose.alias')) !== null) {
@@ -187,10 +195,8 @@ function applyGraphvizStyle(Graph $graph, bool $horizontal) : Graph
  *
  * @return Graph A copy of the input graph with vertices and edges for services
  */
-function makeVerticesAndEdges(Graph $graph, array $services, array $volumes, array $networks, bool $withVolumes) : Graph
+function makeVerticesAndEdges(Graph $graph, array $services, array $volumes, array $networks, bool $withVolumes, $path) : Graph
 {
-    $graph = $graph->createGraphClone();
-
     if ($withVolumes === true) {
         foreach (array_keys($volumes) as $volume) {
             addVolume($graph, 'named: '.$volume);
@@ -205,7 +211,22 @@ function makeVerticesAndEdges(Graph $graph, array $services, array $volumes, arr
     }
 
     foreach ($services as $service => $definition) {
-        $vertices[$service] = addService($graph, $service);
+        addService($graph, $service);
+
+        if (isset($definition['extends'])) {
+            $configuration = readConfiguration(dirname($path).DIRECTORY_SEPARATOR.$definition['extends']['file']);
+            $extendedServices = fetchServices($configuration);
+            $extendedVolumes = fetchVolumes($configuration);
+            $extendedNetworks = fetchVolumes($configuration);
+
+            $graph = makeVerticesAndEdges($graph, $extendedServices, $extendedVolumes, $extendedNetworks, $withVolumes, dirname($path).DIRECTORY_SEPARATOR.$definition['extends']['file']);
+
+            addRelation(
+                 addService($graph, $definition['extends']['service']),
+                $graph->getVertex($service),
+                'extends'
+            );
+        }
 
         foreach ($definition['links'] ?? [] as $link) {
             list($target, $alias) = explodeMapping($link);

@@ -97,6 +97,15 @@ Ports (from `services.<service>.ports`) are displayed as circle and are linked t
 If we look at the link between port `2480` and `orientdb`, it reads as follow: "traffic coming to host port `2480` will be routed to port `2480` of `orientdb`."
 If we look at the link between port `2580` and `elk`, it reads as follow: "traffix coming to host port `2580` will be routed to port `80` of `elk`."
 
+### Extends
+
+Extended services (from `services.<service>.extends`) are displayed as components (just like normal services). The link between them and the extending services are 
+displayed as inverted arrows:
+
+![ports](resources/extends.png)
+
+If we look at the link between `mysql` and `db`, it reads as follow: "`mysql` extends  service `db`".
+
 ## Examples
 
 ### `dot` renderer
