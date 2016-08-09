@@ -10,6 +10,8 @@ COPY bin/    /dcv/bin
 COPY src/    /dcv/src
 COPY vendor/ /dcv/vendor
 
+RUN chmod +x /dcv/bin/dcv
+
 RUN addgroup dcv && \
     adduser -D -G dcv -s /bin/bash -g "docker-compose-viz" -h /input dcv
 
