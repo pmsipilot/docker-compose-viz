@@ -409,7 +409,22 @@ function addNetwork(Graph $graph, string $name, string $type = null)
  */
 function addRelation(Vertex $from, Vertex $to, string $type, string $alias = null, bool $bidirectional = false) : Edge\Directed
 {
-    $edge = $from->createEdgeTo($to);
+    $edge = null;
+
+    if ($from->hasEdgeTo($to)) {
+        $edges = $from->getEdgesTo($to);
+
+        foreach ($edges as $edge) {
+            if ($edge->getAttribute('docker_compose.type') === $type) {
+                break;
+            }
+        }
+    }
+
+    if (null === $edge) {
+        $edge = $from->createEdgeTo($to);
+    }
+
     $edge->setAttribute('docker_compose.type', $type);
 
     if ($alias !== null) {

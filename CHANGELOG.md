@@ -1,5 +1,6 @@
 # `1.0.0` (unreleased)
 
+* Avoid duplicating edges when there is multiple extended services
 * Display extended services as components with inverted arrows
 * Display services as components
 * Display volumes as folders
