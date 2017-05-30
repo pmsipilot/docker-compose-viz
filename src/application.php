@@ -4,12 +4,12 @@ namespace PMSIpilot\DockerComposeViz;
 
 use Graphp\GraphViz\GraphViz;
 use Symfony\Component\Console;
-use function PMSIpilot\DockerComposeViz\readConfiguration;
+use function PMSIpilot\DockerComposeViz\applyGraphvizStyle;
+use function PMSIpilot\DockerComposeViz\createGraph;
+use function PMSIpilot\DockerComposeViz\fetchNetworks;
 use function PMSIpilot\DockerComposeViz\fetchServices;
 use function PMSIpilot\DockerComposeViz\fetchVolumes;
-use function PMSIpilot\DockerComposeViz\fetchNetworks;
-use function PMSIpilot\DockerComposeViz\createGraph;
-use function PMSIpilot\DockerComposeViz\applyGraphvizStyle;
+use function PMSIpilot\DockerComposeViz\readConfiguration;
 
 $application = new Console\Application();
 
