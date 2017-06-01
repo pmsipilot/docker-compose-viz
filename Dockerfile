@@ -1,4 +1,4 @@
-FROM php:7-alpine
+FROM php:7.1-alpine
 
 RUN apk update && \
     apk add graphviz ttf-dejavu && \
