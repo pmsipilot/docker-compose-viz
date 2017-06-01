@@ -11,8 +11,9 @@ php:
     - nightly
 
 env:
-    - COMPOSERFLAGS=
-    - COMPOSERFLAGS=--prefer-lowest
+    matrix:
+        - COMPOSERFLAGS=
+        - COMPOSERFLAGS=--prefer-lowest
 
     global:
         # DOCKER_EMAIL
