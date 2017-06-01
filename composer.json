@@ -2,7 +2,7 @@
     "name": "pmsipilot/docker-compose-viz",
     "description": "Docker compose graph visualization",
     "require": {
-        "symfony/yaml": "^3.1",
+        "symfony/yaml": "^3.1 || ^4@dev",
         "symfony/console": "^3.1",
         "clue/graph": "^0.9",
         "graphp/graphviz": "^0.2"

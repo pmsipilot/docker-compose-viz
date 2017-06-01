@@ -2,14 +2,21 @@ language: php
 
 php:
     - 7.0
+    - 7.1
     - nightly
 
 env:
-    matrix:
-        - COMPOSERFLAGS="--prefer-stable"
-        - COMPOSERFLAGS="--prefer-lowest"
+    - COMPOSERFLAGS=
+    - COMPOSERFLAGS=--prefer-lowest
 
 matrix:
+    exclude:
+        - php: 7.0
+          env: COMPOSERFLAGS=
+        - php: 7.1
+          env: COMPOSERFLAGS=--prefer-lowest
+        - php: nightly
+          env: COMPOSERFLAGS=--prefer-lowest
     allow_failures:
         - php: nightly
 
