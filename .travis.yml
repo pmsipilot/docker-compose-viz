@@ -41,8 +41,10 @@ deploy:
     - provider: script
       script: ci/deploy.sh
       on:
+          php: 7.1
           all_branches: master
     - provider: script
       script: ci/deploy.sh
       on:
+          php: 7.1
           tags: true
