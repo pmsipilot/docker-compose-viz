@@ -7,12 +7,12 @@ services:
 
 php:
     - 7.0
+    - 7.1
     - nightly
 
 env:
-    matrix:
-        - COMPOSERFLAGS="--prefer-stable"
-        - COMPOSERFLAGS="--prefer-lowest"
+    - COMPOSERFLAGS=
+    - COMPOSERFLAGS=--prefer-lowest
 
     global:
         # DOCKER_EMAIL
@@ -23,6 +23,13 @@ env:
         - secure: "BqpmNofWU38cV3eUT9Hm9wxiiRlp1LKl1JQBxvsYng/dk4L7ONiBVsrG6T7nYhkTktWc/II4ZAoQ7AGHN42W1quzSmc6d0fszQ7uTwNobfFQu2JzFNkhyP9D6b0v8uXhT8n6TPqOGgoJUcguStvasG3TuZwn7+PhwjyVfnzf+DhyaXjCljMatg7ekL0JDPGdAz/SQhuBiwk2xlZtxtEokNy7IVr9VcMi2O0nG3LMhCl1sQjo3JKBxPsalQi78dShDUHcazAE68T7M1FjAZCJYia902FMDWiIuujLamq+NpDgEKB3aLCLwF/o3j8z3ekPrk2v9Zokz+t36cQ2BmPpwqFfhvPdUv9tj9bi7Qv2R4NKreX8TWB8KB5afSVWiKfufWV5hp5KfwEmcLBc/hQdjRIwzDqVPK/fyy/GJ5fT4X5kz+YYLQEFxeWPtxL+OpQUXx2P5iDhx5qz173lO4h1WX4vEQ3p4aFbfnNREUDPGYsMJo6flm5Azq8F0qh065sxPldKunr9H4fAXrFzqMJnTepReEGPNJRn35TLl08RI7GTp0hKxlaycsu+c2Qz0/GcKbODWf5w24d/pxrOMM9KmJpDZTBm9bWiZlRbbZm1OnK0PiaRi9ft44Em5NYTFVvuWL2M2tIyGObI3kquKTkANvrSuPTofJ0JawXg2YBKOH8="
 
 matrix:
+    exclude:
+        - php: 7.0
+          env: COMPOSERFLAGS=
+        - php: 7.1
+          env: COMPOSERFLAGS=--prefer-lowest
+        - php: nightly
+          env: COMPOSERFLAGS=--prefer-lowest
     allow_failures:
         - php: nightly
 
