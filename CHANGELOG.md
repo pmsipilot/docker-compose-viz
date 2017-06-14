@@ -1,4 +1,10 @@
-# `1.0.0` (unreleased)
+# `1.1.0` (unreleased)
+
+## Bugfix
+
+* Mappings are correctly exploded
+
+# `1.0.0`
 
 * Avoid duplicating edges when there is multiple extended services
 * Display extended services as components with inverted arrows

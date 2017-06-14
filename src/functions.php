@@ -268,7 +268,7 @@ function makeVerticesAndEdges(Graph $graph, array $services, array $volumes, arr
 
         if ($withVolumes === true) {
             foreach ($definition['volumes'] ?? [] as $volume) {
-                list($host, $container, $attr) = explodeMapping($volume);
+                list($host, $container, $attr) = explodeVolumeMapping($volume);
 
                 if ($host[0] !== '.' && $host[0] !== DIRECTORY_SEPARATOR) {
                     $host = 'named: '.$host;
@@ -285,10 +285,10 @@ function makeVerticesAndEdges(Graph $graph, array $services, array $volumes, arr
         }
 
         foreach ($definition['ports'] ?? [] as $port) {
-            list($host, $container, $proto) = explodeMapping($port);
+            list($host, $container, $proto) = explodePortMapping($port);
 
             addRelation(
-                addPort($graph, (int) $host, $proto),
+                addPort($graph, $host, $proto),
                 $graph->getVertex($service),
                 'ports',
                 $host !== $container ? $container : null
@@ -337,12 +337,12 @@ function addService(Graph $graph, string $service, string $type = null)
  * @internal
  *
  * @param Graph       $graph Input graph
- * @param int         $port  Port number
+ * @param int|string  $port  Port number
  * @param string|null $proto Protocol
  *
  * @return Vertex
  */
-function addPort(Graph $graph, int $port, string $proto = null)
+function addPort(Graph $graph, $port, string $proto = null)
 {
     if ($graph->hasVertex($port) === true) {
         return $graph->getVertex($port);
@@ -439,6 +439,52 @@ function addRelation(Vertex $from, Vertex $to, string $type, string $alias = nul
 /**
  * @internal
  *
+ * @param string $mapping A docker volume mapping (<from>[:<to>[:rw|ro]])
+ *
+ * @return array An 2 items array containing the parts of the mapping.
+ *               If the mapping does not specify a second part, the first one will be repeated
+ */
+function explodeVolumeMapping($mapping) : array
+{
+    $parts = explode(':', $mapping);
+    $parts[1] = $parts[1] ?? $parts[0];
+
+    return [$parts[0], $parts[1], $parts[2] ?? null];
+}
+
+/**
+ * @internal
+ *
+ * @param string $mapping A docker mapping ([<from-ip>:]<from>[:<to>[/[tcp|udp]]])
+ *
+ * @return array An 2 items array containing the parts of the mapping.
+ *               If the mapping does not specify a second part, the first one will be repeated
+ */
+function explodePortMapping($mapping) : array
+{
+    $parts = explode(':', $mapping);
+
+    if (filter_var($parts[0], FILTER_VALIDATE_IP) !== false) {
+        $ip = array_shift($parts);
+        $port = array_shift($parts);
+
+        $parts = [$ip.':'.$port, $parts[0] ?? $port] + $parts;
+    }
+
+    $parts[1] = $parts[1] ?? $parts[0];
+
+    $subparts = array_values(array_filter(explode('/', $parts[1])));
+
+    if (count($subparts) > 2) {
+        $subparts = [$parts[1], $parts[2] ?? null];
+    }
+
+    return [$parts[0], $subparts[0], $subparts[1] ?? null];
+}
+
+/**
+ * @internal
+ *
  * @param string $mapping A docker mapping (<from>[:<to>])
  *
  * @return array An 2 items array containing the parts of the mapping.
@@ -449,11 +495,5 @@ function explodeMapping($mapping) : array
     $parts = explode(':', $mapping);
     $parts[1] = $parts[1] ?? $parts[0];
 
-    $subparts = array_values(array_filter(explode('/', $parts[1])));
-
-    if (count($subparts) > 2) {
-        $subparts = [$parts[1], $parts[2] ?? null];
-    }
-
-    return [$parts[0], $subparts[0], $subparts[1] ?? null];
+    return [$parts[0], $parts[1]];
 }
