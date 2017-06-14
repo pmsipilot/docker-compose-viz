@@ -228,9 +228,15 @@ function makeVerticesAndEdges(Graph $graph, array $services, array $volumes, arr
             );
         }
 
+        $serviceLinks = [];
+
         foreach ($definition['links'] ?? [] as $link) {
             list($target, $alias) = explodeMapping($link);
 
+            $serviceLinks[$alias] = $target;
+        }
+
+        foreach ($serviceLinks as $alias => $target) {
             addRelation(
                 addService($graph, $target),
                 $graph->getVertex($service),
@@ -267,8 +273,16 @@ function makeVerticesAndEdges(Graph $graph, array $services, array $volumes, arr
         }
 
         if ($withVolumes === true) {
+            $serviceVolumes = [];
+
             foreach ($definition['volumes'] ?? [] as $volume) {
                 list($host, $container, $attr) = explodeMapping($volume);
+
+                $serviceVolumes[$container] = [$host, $attr];
+            }
+
+            foreach ($serviceVolumes as $container => $volume) {
+                list($host, $attr) = $volume;
 
                 if ($host[0] !== '.' && $host[0] !== DIRECTORY_SEPARATOR) {
                     $host = 'named: '.$host;

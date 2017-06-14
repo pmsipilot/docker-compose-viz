@@ -1,4 +1,8 @@
-# `1.0.0` (unreleased)
+# `1.1.0` (unreleased)
+
+* Automatically load override file if it exists or ignore it using `--ignore-override`
+
+# `1.0.0`
 
 * Avoid duplicating edges when there is multiple extended services
 * Display extended services as components with inverted arrows
