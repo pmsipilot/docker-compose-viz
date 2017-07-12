@@ -45,18 +45,21 @@ bin/dcv
 ## Usage
 
 ```
-render [options] [--] [<input-file>]
+Usage:
+  render [options] [--] [<input-file>]
 
 Arguments:
   input-file                         Path to a docker compose file [default: "./docker-compose.yml"]
 
 Options:
+      --override=OVERRIDE            Tag of the override file to use [default: "override"]
   -o, --output-file=OUTPUT-FILE      Path to a output file (Only for "dot" and "image" output format) [default: "./docker-compose.dot" or "./docker-compose.png"]
   -m, --output-format=OUTPUT-FORMAT  Output format (one of: "dot", "image", "display") [default: "display"]
       --only=ONLY                    Display a graph only for a given services (multiple values allowed)
   -f, --force                        Overwrites output file if it already exists
       --no-volumes                   Do not display volumes
   -r, --horizontal                   Display a horizontal graph
+      --ignore-override              Ignore override file
 ```
 
 ## How to read the graph

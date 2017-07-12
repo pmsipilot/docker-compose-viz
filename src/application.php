@@ -16,6 +16,7 @@ $application = new Console\Application();
 $application->register('render')
     ->addArgument('input-file', Console\Input\InputArgument::OPTIONAL, 'Path to a docker compose file', getcwd().DIRECTORY_SEPARATOR.'docker-compose.yml')
 
+    ->addOption('override', null, Console\Input\InputOption::VALUE_REQUIRED, 'Tag of the override file to use', 'override')
     ->addOption('output-file', 'o', Console\Input\InputOption::VALUE_REQUIRED, 'Path to a output file (Only for "dot" and "image" output format)')
     ->addOption('output-format', 'm', Console\Input\InputOption::VALUE_REQUIRED, 'Output format (one of: "dot", "image", "display")', 'display')
     ->addOption('only', null, Console\Input\InputOption::VALUE_IS_ARRAY | Console\Input\InputOption::VALUE_REQUIRED, 'Display a graph only for a given services')
@@ -23,15 +24,19 @@ $application->register('render')
     ->addOption('force', 'f', Console\Input\InputOption::VALUE_NONE, 'Overwrites output file if it already exists')
     ->addOption('no-volumes', null, Console\Input\InputOption::VALUE_NONE, 'Do not display volumes')
     ->addOption('horizontal', 'r', Console\Input\InputOption::VALUE_NONE, 'Display a horizontal graph')
+    ->addOption('ignore-override', null, Console\Input\InputOption::VALUE_NONE, 'Ignore override file')
 
     ->setCode(function (Console\Input\InputInterface $input, Console\Output\OutputInterface $output) {
         $inputFile = $input->getArgument('input-file');
+        $inputFileExtension = pathinfo($inputFile, PATHINFO_EXTENSION);
+        $overrideFile = dirname($inputFile).DIRECTORY_SEPARATOR.basename($inputFile, '.'.$inputFileExtension).'.'.$input->getOption('override').'.'.$inputFileExtension;
+
         $outputFormat = $input->getOption('output-format');
         $outputFile = $input->getOption('output-file') ?: getcwd().DIRECTORY_SEPARATOR.'docker-compose.'.($outputFormat === 'dot' ? $outputFormat : 'png');
         $onlyServices = $input->getOption('only');
 
         if (in_array($outputFormat, ['dot', 'image', 'display']) === false) {
-            throw new Console\Exception\InvalidArgumentException(sprintf('Invalid output format "%s". It must be one of "dot", "png" or "display".', $outputFormat));
+            throw new Console\Exception\InvalidArgumentException(sprintf('Invalid output format "%s". It must be one of "dot", "image" or "display".', $outputFormat));
         }
 
         if ($outputFormat === 'display') {
@@ -45,6 +50,13 @@ $application->register('render')
         }
 
         $configuration = readConfiguration($inputFile);
+
+        if (!$input->getOption('ignore-override') && file_exists($overrideFile)) {
+            $override = readConfiguration($overrideFile);
+
+            $configuration = array_merge_recursive($configuration, $override);
+        }
+
         $services = fetchServices($configuration);
         $volumes = fetchVolumes($configuration);
         $networks = fetchNetworks($configuration);
