@@ -23,7 +23,7 @@ fix-cs:
 clean:
 	rm -rf vendor/
 
-docker.lock: Dockerfile vendor
+docker.lock: Dockerfile bin/entrypoint.sh vendor src/application.php src/functions.php
 	$(COMPOSER) dump-autoload --classmap-authoritative
 	$(DOCKER) build -t $(DCV_IMAGE_NAME) .
 	touch docker.lock

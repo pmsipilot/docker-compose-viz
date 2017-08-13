@@ -6,7 +6,7 @@ CURRENT_DIR=$(dirname $0)
 
 if [ "$1" = "render" ]
 then
-    $("$CURRENT_DIR/dcv" "$@")
+    $CURRENT_DIR/dcv "$@"
 else
     exec "$@"
 fi

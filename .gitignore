@@ -2,4 +2,5 @@ vendor/
 docker.lock
 bin/
 !bin/dcv
-!bin/entry_script.sh
+!bin/entrypoint.sh
+.cache/
