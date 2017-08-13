@@ -19,5 +19,5 @@ USER dcv
 VOLUME /input
 WORKDIR /input
 
-ENTRYPOINT ["/dcv/bin/entry_script.sh"]
+ENTRYPOINT ["/dcv/bin/entrypoint.sh"]
 CMD ["render", "-m", "image", "-f"]
