@@ -174,6 +174,10 @@ function applyGraphvizStyle(Graph $graph, bool $horizontal) : Graph
 
         if (($alias = $edge->getAttribute('docker_compose.alias')) !== null) {
             $edge->setAttribute('graphviz.label', $alias);
+
+            if ($edge->getAttribute('docker_compose.condition') !== null) {
+                $edge->setAttribute('graphviz.fontsize', '10');
+            }
         }
 
         if ($edge->getAttribute('docker_compose.bidir')) {
@@ -256,11 +260,14 @@ function makeVerticesAndEdges(Graph $graph, array $services, array $volumes, arr
             );
         }
 
-        foreach ($definition['depends_on'] ?? [] as $dependency) {
+        foreach ($definition['depends_on'] ?? [] as $key => $dependency) {
             addRelation(
                 $graph->getVertex($service),
-                addService($graph, $dependency),
-                'depends_on'
+                addService($graph, is_array($dependency) ? $key : $dependency),
+                'depends_on',
+                is_array($dependency) && isset($dependency['condition']) ? $dependency['condition'] : null,
+                false,
+                is_array($dependency) && isset($dependency['condition'])
             );
         }
 
@@ -418,10 +425,11 @@ function addNetwork(Graph $graph, string $name, string $type = null)
  * @param string      $type          Type of the relation (one of "links", "volumes_from", "depends_on", "ports");
  * @param string|null $alias         Alias associated to the linked element
  * @param bool|null   $bidirectional Biderectional or not
+ * @param bool|null   $condition     Wether the alias represents a condition or not
  *
  * @return Edge\Directed
  */
-function addRelation(Vertex $from, Vertex $to, string $type, string $alias = null, bool $bidirectional = false) : Edge\Directed
+function addRelation(Vertex $from, Vertex $to, string $type, string $alias = null, bool $bidirectional = false, bool $condition = false) : Edge\Directed
 {
     $edge = null;
 
@@ -443,6 +451,10 @@ function addRelation(Vertex $from, Vertex $to, string $type, string $alias = nul
 
     if ($alias !== null) {
         $edge->setAttribute('docker_compose.alias', $alias);
+    }
+
+    if (true === $condition) {
+        $edge->setAttribute('docker_compose.condition', true);
     }
 
     $edge->setAttribute('docker_compose.bidir', $bidirectional);
