@@ -1,5 +1,7 @@
 # `1.1.0` (unreleased)
 
+* Display `depends_on` conditions
+* Handle conditions in `depends_on`
 * Automatically load override file if it exists or ignore it using `--ignore-override`
 
 # `1.0.0`
