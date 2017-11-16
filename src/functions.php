@@ -256,10 +256,10 @@ function makeVerticesAndEdges(Graph $graph, array $services, array $volumes, arr
             );
         }
 
-        foreach ($definition['depends_on'] ?? [] as $dependency) {
+        foreach ($definition['depends_on'] ?? [] as $key => $dependency) {
             addRelation(
                 $graph->getVertex($service),
-                addService($graph, $dependency),
+                addService($graph, is_array($dependency) ? $key : $dependency),
                 'depends_on'
             );
         }
