@@ -5,12 +5,27 @@ namespace PMSIpilot\DockerComposeViz;
 use Fhaculty\Graph\Edge;
 use Fhaculty\Graph\Graph;
 use Fhaculty\Graph\Vertex;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 
 const WITHOUT_VOLUMES = 1;
 const WITHOUT_NETWORKS = 2;
 const WITHOUT_PORTS = 4;
+
+/**
+ * @internal
+ *
+ * @param OutputInterface $output
+ *
+ * @return callable
+ */
+function logger(OutputInterface $output) : callable
+{
+    return function (string $message, int $verbosity = null) use ($output) {
+        $output->writeln(sprintf('[%s] %s', date(DATE_ISO8601), $message), $verbosity ?: OutputInterface::VERBOSITY_VERBOSE);
+    };
+}
 
 /**
  * @public
@@ -216,7 +231,7 @@ function makeVerticesAndEdges(Graph $graph, array $services, array $volumes, arr
     if (((bool) ($flags & WITHOUT_NETWORKS)) === false) {
         foreach ($networks as $network => $definition) {
             addNetwork(
-                $graph, 'net: ' . $network,
+                $graph, 'net: '.$network,
                 isset($definition['external']) && $definition['external'] === true ? 'external_network' : 'network'
             );
         }
@@ -318,7 +333,7 @@ function makeVerticesAndEdges(Graph $graph, array $services, array $volumes, arr
                 list($host, $container, $proto) = explodeMapping($port);
 
                 addRelation(
-                    addPort($graph, (int)$host, $proto),
+                    addPort($graph, (int) $host, $proto),
                     $graph->getVertex($service),
                     'ports',
                     $host !== $container ? $container : null
@@ -334,7 +349,7 @@ function makeVerticesAndEdges(Graph $graph, array $services, array $volumes, arr
 
                 addRelation(
                     $graph->getVertex($service),
-                    addNetwork($graph, 'net: ' . $network),
+                    addNetwork($graph, 'net: '.$network),
                     'networks',
                     count($aliases) > 0 ? implode(', ', $aliases) : null
                 );

@@ -1,5 +1,6 @@
 # `1.2.0` (unreleased)
 
+* Add a logger and enable `-v` and `-vv` options
 * Add the `--no-networks` and `--no-ports` options to avoid rendering networks and ports
 * Add the `--background` option to set the graph's background color
 * Versions correctly merged and checked

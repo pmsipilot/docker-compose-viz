@@ -30,6 +30,7 @@ $application->register('render')
             throw new Console\Exception\InvalidArgumentException(sprintf('Invalid background color "%s". It must be a valid hex color or "transparent".', $backgroundColor));
         }
 
+        $logger = logger($output);
         $inputFile = $input->getArgument('input-file');
         $inputFileExtension = pathinfo($inputFile, PATHINFO_EXTENSION);
         $overrideFile = dirname($inputFile).DIRECTORY_SEPARATOR.basename($inputFile, '.'.$inputFileExtension).'.'.$input->getOption('override').'.'.$inputFileExtension;
@@ -52,10 +53,12 @@ $application->register('render')
             }
         }
 
+        $logger(sprintf('Reading <comment>configuration</comment> from <info>"%s"</info>', $inputFile));
         $configuration = readConfiguration($inputFile);
         $configurationVersion = (string) ($configuration['version'] ?? 1);
 
         if (!$input->getOption('ignore-override') && file_exists($overrideFile)) {
+            $logger(sprintf('Reading <comment>override</comment> from <info>"%s"</info>', $overrideFile));
             $override = readConfiguration($overrideFile);
             $overrideVersion = (string) ($override['version'] ?? 1);
 
@@ -64,14 +67,26 @@ $application->register('render')
             }
 
             $configuration = array_merge_recursive($configuration, $override);
+
+            $logger(sprintf('Configuration <comment>version</comment> is <info>"%s"</info>', $configurationVersion), Console\Output\OutputInterface::VERBOSITY_VERY_VERBOSE);
             $configuration['version'] = $configurationVersion;
         }
 
+        $logger('Fetching <comment>services</comment>');
         $services = fetchServices($configuration);
+        $logger(sprintf('Found <info>%d</info> <comment>services</comment>', count($services)), Console\Output\OutputInterface::VERBOSITY_VERY_VERBOSE);
+
+        $logger('Fetching <comment>volumes</comment>');
         $volumes = fetchVolumes($configuration);
+        $logger(sprintf('Found <info>%d</info> <comment>volumes</comment>', count($volumes)), Console\Output\OutputInterface::VERBOSITY_VERY_VERBOSE);
+
+        $logger('Fetching <comment>networks</comment>');
         $networks = fetchNetworks($configuration);
+        $logger(sprintf('Found <info>%d</info> <comment>networks</comment>', count($networks)), Console\Output\OutputInterface::VERBOSITY_VERY_VERBOSE);
 
         if ([] !== $onlyServices) {
+            $logger(sprintf('Only <info>%s</info> <comment>services</comment> will be displayed', implode(', ', $onlyServices)));
+
             $intersect = array_intersect($onlyServices, array_keys($services));
 
             if ($intersect !== $onlyServices) {
@@ -89,17 +104,24 @@ $application->register('render')
 
         $flags = 0;
         if ($input->getOption('no-volumes') === true) {
+            $logger('<comment>Volumes</comment> will not be displayed');
+
             $flags |= WITHOUT_VOLUMES;
         }
 
         if ($input->getOption('no-networks') === true) {
+            $logger('<comment>Networks</comment> will not be displayed');
+
             $flags |= WITHOUT_NETWORKS;
         }
 
         if ($input->getOption('no-ports') === true) {
+            $logger('<comment>Ports</comment> will not be displayed');
+
             $flags |= WITHOUT_PORTS;
         }
 
+        $logger('Rendering <comment>graph</comment>');
         $graph = applyGraphvizStyle(
             createGraph($services, $volumes, $networks, $inputFile, $flags),
             $input->getOption('horizontal'),
