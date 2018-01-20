@@ -8,6 +8,10 @@ use Fhaculty\Graph\Vertex;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 
+const WITHOUT_VOLUMES = 1;
+const WITHOUT_NETWORKS = 2;
+const WITHOUT_PORTS = 4;
+
 /**
  * @public
  *
@@ -87,9 +91,9 @@ function fetchNetworks(array $configuration) : array
  *
  * @return Graph The complete graph for the given list of services
  */
-function createGraph(array $services, array $volumes, array $networks, bool $withVolumes, string $path) : Graph
+function createGraph(array $services, array $volumes, array $networks, string $path, int $flags) : Graph
 {
-    return makeVerticesAndEdges(new Graph(), $services, $volumes, $networks, $withVolumes, $path);
+    return makeVerticesAndEdges(new Graph(), $services, $volumes, $networks, $path, $flags);
 }
 
 /**
@@ -201,19 +205,21 @@ function applyGraphvizStyle(Graph $graph, bool $horizontal, string $background) 
  *
  * @return Graph A copy of the input graph with vertices and edges for services
  */
-function makeVerticesAndEdges(Graph $graph, array $services, array $volumes, array $networks, bool $withVolumes, $path) : Graph
+function makeVerticesAndEdges(Graph $graph, array $services, array $volumes, array $networks, string $path, int $flags) : Graph
 {
-    if ($withVolumes === true) {
+    if (((bool) ($flags & WITHOUT_VOLUMES)) === false) {
         foreach (array_keys($volumes) as $volume) {
             addVolume($graph, 'named: '.$volume);
         }
     }
 
-    foreach ($networks as $network => $definition) {
-        addNetwork(
-            $graph, 'net: '.$network,
-            isset($definition['external']) && $definition['external'] === true ? 'external_network' : 'network'
-        );
+    if (((bool) ($flags & WITHOUT_NETWORKS)) === false) {
+        foreach ($networks as $network => $definition) {
+            addNetwork(
+                $graph, 'net: ' . $network,
+                isset($definition['external']) && $definition['external'] === true ? 'external_network' : 'network'
+            );
+        }
     }
 
     foreach ($services as $service => $definition) {
@@ -225,7 +231,7 @@ function makeVerticesAndEdges(Graph $graph, array $services, array $volumes, arr
             $extendedVolumes = fetchVolumes($configuration);
             $extendedNetworks = fetchVolumes($configuration);
 
-            $graph = makeVerticesAndEdges($graph, $extendedServices, $extendedVolumes, $extendedNetworks, $withVolumes, dirname($path).DIRECTORY_SEPARATOR.$definition['extends']['file']);
+            $graph = makeVerticesAndEdges($graph, $extendedServices, $extendedVolumes, $extendedNetworks, dirname($path).DIRECTORY_SEPARATOR.$definition['extends']['file'], $flags);
 
             addRelation(
                  addService($graph, $definition['extends']['service']),
@@ -281,7 +287,7 @@ function makeVerticesAndEdges(Graph $graph, array $services, array $volumes, arr
             );
         }
 
-        if ($withVolumes === true) {
+        if (((bool) ($flags & WITHOUT_VOLUMES)) === false) {
             $serviceVolumes = [];
 
             foreach ($definition['volumes'] ?? [] as $volume) {
@@ -307,28 +313,32 @@ function makeVerticesAndEdges(Graph $graph, array $services, array $volumes, arr
             }
         }
 
-        foreach ($definition['ports'] ?? [] as $port) {
-            list($host, $container, $proto) = explodeMapping($port);
+        if (((bool) ($flags & WITHOUT_PORTS)) === false) {
+            foreach ($definition['ports'] ?? [] as $port) {
+                list($host, $container, $proto) = explodeMapping($port);
 
-            addRelation(
-                addPort($graph, (int) $host, $proto),
-                $graph->getVertex($service),
-                'ports',
-                $host !== $container ? $container : null
-            );
+                addRelation(
+                    addPort($graph, (int)$host, $proto),
+                    $graph->getVertex($service),
+                    'ports',
+                    $host !== $container ? $container : null
+                );
+            }
         }
 
-        foreach ($definition['networks'] ?? [] as $network => $config) {
-            $network = is_int($network) ? $config : $network;
-            $config = is_int($network) ? [] : $config;
-            $aliases = $config['aliases'] ?? [];
+        if (((bool) ($flags & WITHOUT_NETWORKS)) === false) {
+            foreach ($definition['networks'] ?? [] as $network => $config) {
+                $network = is_int($network) ? $config : $network;
+                $config = is_int($network) ? [] : $config;
+                $aliases = $config['aliases'] ?? [];
 
-            addRelation(
-                $graph->getVertex($service),
-                addNetwork($graph, 'net: '.$network),
-                'networks',
-                count($aliases) > 0 ? implode(', ', $aliases) : null
-            );
+                addRelation(
+                    $graph->getVertex($service),
+                    addNetwork($graph, 'net: ' . $network),
+                    'networks',
+                    count($aliases) > 0 ? implode(', ', $aliases) : null
+                );
+            }
         }
     }
 

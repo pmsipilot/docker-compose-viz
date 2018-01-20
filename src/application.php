@@ -17,6 +17,8 @@ $application->register('render')
 
     ->addOption('force', 'f', Console\Input\InputOption::VALUE_NONE, 'Overwrites output file if it already exists')
     ->addOption('no-volumes', null, Console\Input\InputOption::VALUE_NONE, 'Do not display volumes')
+    ->addOption('no-networks', null, Console\Input\InputOption::VALUE_NONE, 'Do not display networks')
+    ->addOption('no-ports', null, Console\Input\InputOption::VALUE_NONE, 'Do not display ports')
     ->addOption('horizontal', 'r', Console\Input\InputOption::VALUE_NONE, 'Display a horizontal graph')
     ->addOption('ignore-override', null, Console\Input\InputOption::VALUE_NONE, 'Ignore override file')
     ->addOption('background', null, Console\Input\InputOption::VALUE_REQUIRED, 'Set the graph background color', '#ffffff')
@@ -85,8 +87,21 @@ $application->register('render')
             );
         }
 
+        $flags = 0;
+        if ($input->getOption('no-volumes') === true) {
+            $flags |= WITHOUT_VOLUMES;
+        }
+
+        if ($input->getOption('no-networks') === true) {
+            $flags |= WITHOUT_NETWORKS;
+        }
+
+        if ($input->getOption('no-ports') === true) {
+            $flags |= WITHOUT_PORTS;
+        }
+
         $graph = applyGraphvizStyle(
-            createGraph($services, $volumes, $networks, $input->getOption('no-volumes') === false, $inputFile),
+            createGraph($services, $volumes, $networks, $inputFile, $flags),
             $input->getOption('horizontal'),
             $input->getOption('background')
         );
