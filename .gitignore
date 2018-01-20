@@ -4,3 +4,4 @@ bin/
 !bin/dcv
 !bin/entrypoint.sh
 .cache/
+.php_cs.cache

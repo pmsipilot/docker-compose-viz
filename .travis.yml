@@ -8,12 +8,14 @@ services:
 php:
     - 7.0
     - 7.1
+    - 7.2
     - nightly
 
 env:
     matrix:
         - COMPOSERFLAGS=
         - COMPOSERFLAGS=--prefer-lowest
+        - COMPOSERFLAGS=--prefer-stable
 
     global:
         # DOCKER_EMAIL
@@ -28,6 +30,8 @@ matrix:
         - php: 7.0
           env: COMPOSERFLAGS=
         - php: 7.1
+          env: COMPOSERFLAGS=--prefer-lowest
+        - php: 7.2
           env: COMPOSERFLAGS=--prefer-lowest
         - php: nightly
           env: COMPOSERFLAGS=--prefer-lowest

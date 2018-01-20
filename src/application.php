@@ -26,7 +26,7 @@ $application->register('render')
     ->setCode(function (Console\Input\InputInterface $input, Console\Output\OutputInterface $output) {
         $backgroundColor = $input->getOption('background');
 
-        if (preg_match('/^#[a-fA-F0-9]{6}|transparent$/', $backgroundColor) === 0) {
+        if (0 === preg_match('/^#[a-fA-F0-9]{6}|transparent$/', $backgroundColor)) {
             throw new Console\Exception\InvalidArgumentException(sprintf('Invalid background color "%s". It must be a valid hex color or "transparent".', $backgroundColor));
         }
 
@@ -36,19 +36,19 @@ $application->register('render')
         $overrideFile = dirname($inputFile).DIRECTORY_SEPARATOR.basename($inputFile, '.'.$inputFileExtension).'.'.$input->getOption('override').'.'.$inputFileExtension;
 
         $outputFormat = $input->getOption('output-format');
-        $outputFile = $input->getOption('output-file') ?: getcwd().DIRECTORY_SEPARATOR.'docker-compose.'.($outputFormat === 'dot' ? $outputFormat : 'png');
+        $outputFile = $input->getOption('output-file') ?: getcwd().DIRECTORY_SEPARATOR.'docker-compose.'.('dot' === $outputFormat ? $outputFormat : 'png');
         $onlyServices = $input->getOption('only');
 
-        if (in_array($outputFormat, ['dot', 'image', 'display']) === false) {
+        if (false === in_array($outputFormat, ['dot', 'image', 'display'])) {
             throw new Console\Exception\InvalidArgumentException(sprintf('Invalid output format "%s". It must be one of "dot", "image" or "display".', $outputFormat));
         }
 
-        if ($outputFormat === 'display') {
+        if ('display' === $outputFormat) {
             if ($input->getOption('force') || $input->getOption('output-file')) {
                 $output->writeln('<comment>The following options are ignored with the "display" output format: "--force", "--output-file"</comment>');
             }
         } else {
-            if (file_exists($outputFile) === true && $input->getOption('force') === false) {
+            if (true === file_exists($outputFile) && false === $input->getOption('force')) {
                 throw new Console\Exception\InvalidArgumentException(sprintf('File "%s" already exists. Use the "--force" option to overwrite it.', $outputFile));
             }
         }
@@ -103,19 +103,19 @@ $application->register('render')
         }
 
         $flags = 0;
-        if ($input->getOption('no-volumes') === true) {
+        if (true === $input->getOption('no-volumes')) {
             $logger('<comment>Volumes</comment> will not be displayed');
 
             $flags |= WITHOUT_VOLUMES;
         }
 
-        if ($input->getOption('no-networks') === true) {
+        if (true === $input->getOption('no-networks')) {
             $logger('<comment>Networks</comment> will not be displayed');
 
             $flags |= WITHOUT_NETWORKS;
         }
 
-        if ($input->getOption('no-ports') === true) {
+        if (true === $input->getOption('no-ports')) {
             $logger('<comment>Ports</comment> will not be displayed');
 
             $flags |= WITHOUT_PORTS;
