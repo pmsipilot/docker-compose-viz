@@ -20,7 +20,7 @@ const WITHOUT_PORTS = 4;
  *
  * @return callable
  */
-function logger(OutputInterface $output) : callable
+function logger(OutputInterface $output): callable
 {
     return function (string $message, int $verbosity = null) use ($output) {
         $output->writeln(sprintf('[%s] %s', date(DATE_ISO8601), $message), $verbosity ?: OutputInterface::VERBOSITY_VERBOSE);
@@ -34,9 +34,9 @@ function logger(OutputInterface $output) : callable
  *
  * @return array
  */
-function readConfiguration(string $path) : array
+function readConfiguration(string $path): array
 {
-    if (file_exists($path) === false) {
+    if (false === file_exists($path)) {
         throw new \InvalidArgumentException(sprintf('File "%s" does not exist', $path));
     }
 
@@ -54,9 +54,9 @@ function readConfiguration(string $path) : array
  *
  * @return array List of service definitions exctracted from the configuration
  */
-function fetchServices(array $configuration) : array
+function fetchServices(array $configuration): array
 {
-    if (isset($configuration['version']) === false || (int) $configuration['version'] === 1) {
+    if (false === isset($configuration['version']) || 1 === (int) $configuration['version']) {
         return $configuration;
     }
 
@@ -70,9 +70,9 @@ function fetchServices(array $configuration) : array
  *
  * @return array List of service definitions exctracted from the configuration
  */
-function fetchVolumes(array $configuration) : array
+function fetchVolumes(array $configuration): array
 {
-    if (isset($configuration['version']) === false || (int) $configuration['version'] === 1) {
+    if (false === isset($configuration['version']) || 1 === (int) $configuration['version']) {
         return [];
     }
 
@@ -86,9 +86,9 @@ function fetchVolumes(array $configuration) : array
  *
  * @return array List of service definitions exctracted from the configuration
  */
-function fetchNetworks(array $configuration) : array
+function fetchNetworks(array $configuration): array
 {
-    if (isset($configuration['version']) === false || (int) $configuration['version'] === 1) {
+    if (false === isset($configuration['version']) || 1 === (int) $configuration['version']) {
         return [];
     }
 
@@ -106,7 +106,7 @@ function fetchNetworks(array $configuration) : array
  *
  * @return Graph The complete graph for the given list of services
  */
-function createGraph(array $services, array $volumes, array $networks, string $path, int $flags) : Graph
+function createGraph(array $services, array $volumes, array $networks, string $path, int $flags): Graph
 {
     return makeVerticesAndEdges(new Graph(), $services, $volumes, $networks, $path, $flags);
 }
@@ -120,14 +120,14 @@ function createGraph(array $services, array $volumes, array $networks, string $p
  *
  * @return Graph A copy of the input graph with style attributes
  */
-function applyGraphvizStyle(Graph $graph, bool $horizontal, string $background) : Graph
+function applyGraphvizStyle(Graph $graph, bool $horizontal, string $background): Graph
 {
     $graph = $graph->createGraphClone();
     $graph->setAttribute('graphviz.graph.bgcolor', $background);
     $graph->setAttribute('graphviz.graph.pad', '0.5');
     $graph->setAttribute('graphviz.graph.ratio', 'fill');
 
-    if ($horizontal === true) {
+    if (true === $horizontal) {
         $graph->setAttribute('graphviz.graph.rankdir', 'LR');
     }
 
@@ -158,7 +158,7 @@ function applyGraphvizStyle(Graph $graph, bool $horizontal, string $background) 
             case 'port':
                 $vertex->setAttribute('graphviz.shape', 'circle');
 
-                if (($proto = $vertex->getAttribute('docker_compose.proto')) === 'udp') {
+                if ('udp' === ($proto = $vertex->getAttribute('docker_compose.proto'))) {
                     $vertex->setAttribute('graphviz.style', 'dashed');
                 }
                 break;
@@ -193,10 +193,10 @@ function applyGraphvizStyle(Graph $graph, bool $horizontal, string $background) 
                 break;
         }
 
-        if (($alias = $edge->getAttribute('docker_compose.alias')) !== null) {
+        if (null !== ($alias = $edge->getAttribute('docker_compose.alias'))) {
             $edge->setAttribute('graphviz.label', $alias);
 
-            if ($edge->getAttribute('docker_compose.condition') !== null) {
+            if (null !== $edge->getAttribute('docker_compose.condition')) {
                 $edge->setAttribute('graphviz.fontsize', '10');
             }
         }
@@ -220,19 +220,19 @@ function applyGraphvizStyle(Graph $graph, bool $horizontal, string $background) 
  *
  * @return Graph A copy of the input graph with vertices and edges for services
  */
-function makeVerticesAndEdges(Graph $graph, array $services, array $volumes, array $networks, string $path, int $flags) : Graph
+function makeVerticesAndEdges(Graph $graph, array $services, array $volumes, array $networks, string $path, int $flags): Graph
 {
-    if (((bool) ($flags & WITHOUT_VOLUMES)) === false) {
+    if (false === ((bool) ($flags & WITHOUT_VOLUMES))) {
         foreach (array_keys($volumes) as $volume) {
             addVolume($graph, 'named: '.$volume);
         }
     }
 
-    if (((bool) ($flags & WITHOUT_NETWORKS)) === false) {
+    if (false === ((bool) ($flags & WITHOUT_NETWORKS))) {
         foreach ($networks as $network => $definition) {
             addNetwork(
                 $graph, 'net: '.$network,
-                isset($definition['external']) && $definition['external'] === true ? 'external_network' : 'network'
+                isset($definition['external']) && true === $definition['external'] ? 'external_network' : 'network'
             );
         }
     }
@@ -302,7 +302,7 @@ function makeVerticesAndEdges(Graph $graph, array $services, array $volumes, arr
             );
         }
 
-        if (((bool) ($flags & WITHOUT_VOLUMES)) === false) {
+        if (false === ((bool) ($flags & WITHOUT_VOLUMES))) {
             $serviceVolumes = [];
 
             foreach ($definition['volumes'] ?? [] as $volume) {
@@ -314,7 +314,7 @@ function makeVerticesAndEdges(Graph $graph, array $services, array $volumes, arr
             foreach ($serviceVolumes as $container => $volume) {
                 list($host, $attr) = $volume;
 
-                if ($host[0] !== '.' && $host[0] !== DIRECTORY_SEPARATOR) {
+                if ('.' !== $host[0] && DIRECTORY_SEPARATOR !== $host[0]) {
                     $host = 'named: '.$host;
                 }
 
@@ -323,12 +323,12 @@ function makeVerticesAndEdges(Graph $graph, array $services, array $volumes, arr
                     $graph->getVertex($service),
                     'volumes',
                     $host !== $container ? $container : null,
-                    $attr !== 'ro'
+                    'ro' !== $attr
                 );
             }
         }
 
-        if (((bool) ($flags & WITHOUT_PORTS)) === false) {
+        if (false === ((bool) ($flags & WITHOUT_PORTS))) {
             foreach ($definition['ports'] ?? [] as $port) {
                 list($host, $container, $proto) = explodeMapping($port);
 
@@ -341,7 +341,7 @@ function makeVerticesAndEdges(Graph $graph, array $services, array $volumes, arr
             }
         }
 
-        if (((bool) ($flags & WITHOUT_NETWORKS)) === false) {
+        if (false === ((bool) ($flags & WITHOUT_NETWORKS))) {
             foreach ($definition['networks'] ?? [] as $network => $config) {
                 $network = is_int($network) ? $config : $network;
                 $config = is_int($network) ? [] : $config;
@@ -371,7 +371,7 @@ function makeVerticesAndEdges(Graph $graph, array $services, array $volumes, arr
  */
 function addService(Graph $graph, string $service, string $type = null)
 {
-    if ($graph->hasVertex($service) === true) {
+    if (true === $graph->hasVertex($service)) {
         return $graph->getVertex($service);
     }
 
@@ -392,7 +392,7 @@ function addService(Graph $graph, string $service, string $type = null)
  */
 function addPort(Graph $graph, int $port, string $proto = null)
 {
-    if ($graph->hasVertex($port) === true) {
+    if (true === $graph->hasVertex($port)) {
         return $graph->getVertex($port);
     }
 
@@ -413,7 +413,7 @@ function addPort(Graph $graph, int $port, string $proto = null)
  */
 function addVolume(Graph $graph, string $path)
 {
-    if ($graph->hasVertex($path) === true) {
+    if (true === $graph->hasVertex($path)) {
         return $graph->getVertex($path);
     }
 
@@ -434,7 +434,7 @@ function addVolume(Graph $graph, string $path)
  */
 function addNetwork(Graph $graph, string $name, string $type = null)
 {
-    if ($graph->hasVertex($name) === true) {
+    if (true === $graph->hasVertex($name)) {
         return $graph->getVertex($name);
     }
 
@@ -456,7 +456,7 @@ function addNetwork(Graph $graph, string $name, string $type = null)
  *
  * @return Edge\Directed
  */
-function addRelation(Vertex $from, Vertex $to, string $type, string $alias = null, bool $bidirectional = false, bool $condition = false) : Edge\Directed
+function addRelation(Vertex $from, Vertex $to, string $type, string $alias = null, bool $bidirectional = false, bool $condition = false): Edge\Directed
 {
     $edge = null;
 
@@ -476,7 +476,7 @@ function addRelation(Vertex $from, Vertex $to, string $type, string $alias = nul
 
     $edge->setAttribute('docker_compose.type', $type);
 
-    if ($alias !== null) {
+    if (null !== $alias) {
         $edge->setAttribute('docker_compose.alias', $alias);
     }
 
@@ -497,7 +497,7 @@ function addRelation(Vertex $from, Vertex $to, string $type, string $alias = nul
  * @return array An 2 items array containing the parts of the mapping.
  *               If the mapping does not specify a second part, the first one will be repeated
  */
-function explodeMapping($mapping) : array
+function explodeMapping($mapping): array
 {
     $parts = explode(':', $mapping);
     $parts[1] = $parts[1] ?? $parts[0];

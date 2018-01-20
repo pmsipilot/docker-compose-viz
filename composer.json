@@ -2,14 +2,15 @@
     "name": "pmsipilot/docker-compose-viz",
     "description": "Docker compose graph visualization",
     "require": {
-        "symfony/yaml": "^3.1 || ^4@dev",
+        "php": "^7",
+        "symfony/yaml": "^3.1 || ^4",
         "symfony/console": "^3.1",
         "clue/graph": "^0.9",
         "graphp/graphviz": "^0.2"
     },
     "require-dev": {
         "crysalead/kahlan": "^2.5.4",
-        "friendsofphp/php-cs-fixer": "^1.11"
+        "friendsofphp/php-cs-fixer": "^2"
     },
     "license": "MIT",
     "authors": [
