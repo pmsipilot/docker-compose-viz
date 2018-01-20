@@ -50,11 +50,18 @@ $application->register('render')
         }
 
         $configuration = readConfiguration($inputFile);
+        $configurationVersion = (string) ($configuration['version'] ?? 1);
 
         if (!$input->getOption('ignore-override') && file_exists($overrideFile)) {
             $override = readConfiguration($overrideFile);
+            $overrideVersion = (string) ($override['version'] ?? 1);
+
+            if ($configurationVersion !== $overrideVersion) {
+                throw new Console\Exception\LogicException('Version mismatch: file ' . $inputFile . ' specifies version ' . $configurationVersion . ' but file ' . $overrideFile . ' uses version ' . $overrideVersion);
+            }
 
             $configuration = array_merge_recursive($configuration, $override);
+            $configuration['version'] = $configurationVersion;
         }
 
         $services = fetchServices($configuration);

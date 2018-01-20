@@ -28,6 +28,15 @@ function readConfiguration(string $path) : array
     }
 }
 
+function validateVersion(array $configuration) : array
+{
+    if (isset($configuration['version']) === false) {
+        return true;
+    }
+
+
+}
+
 /**
  * @public
  *
