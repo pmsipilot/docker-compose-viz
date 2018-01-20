@@ -4,12 +4,6 @@ namespace PMSIpilot\DockerComposeViz;
 
 use Graphp\GraphViz\GraphViz;
 use Symfony\Component\Console;
-use function PMSIpilot\DockerComposeViz\applyGraphvizStyle;
-use function PMSIpilot\DockerComposeViz\createGraph;
-use function PMSIpilot\DockerComposeViz\fetchNetworks;
-use function PMSIpilot\DockerComposeViz\fetchServices;
-use function PMSIpilot\DockerComposeViz\fetchVolumes;
-use function PMSIpilot\DockerComposeViz\readConfiguration;
 
 $application = new Console\Application();
 
@@ -25,8 +19,15 @@ $application->register('render')
     ->addOption('no-volumes', null, Console\Input\InputOption::VALUE_NONE, 'Do not display volumes')
     ->addOption('horizontal', 'r', Console\Input\InputOption::VALUE_NONE, 'Display a horizontal graph')
     ->addOption('ignore-override', null, Console\Input\InputOption::VALUE_NONE, 'Ignore override file')
+    ->addOption('background', null, Console\Input\InputOption::VALUE_REQUIRED, 'Set the graph background color', '#ffffff')
 
     ->setCode(function (Console\Input\InputInterface $input, Console\Output\OutputInterface $output) {
+        $backgroundColor = $input->getOption('background');
+
+        if (preg_match('/^#[a-fA-F0-9]{6}|transparent$/', $backgroundColor) === 0) {
+            throw new Console\Exception\InvalidArgumentException(sprintf('Invalid background color "%s". It must be a valid hex color or "transparent".', $backgroundColor));
+        }
+
         $inputFile = $input->getArgument('input-file');
         $inputFileExtension = pathinfo($inputFile, PATHINFO_EXTENSION);
         $overrideFile = dirname($inputFile).DIRECTORY_SEPARATOR.basename($inputFile, '.'.$inputFileExtension).'.'.$input->getOption('override').'.'.$inputFileExtension;
@@ -57,7 +58,7 @@ $application->register('render')
             $overrideVersion = (string) ($override['version'] ?? 1);
 
             if ($configurationVersion !== $overrideVersion) {
-                throw new Console\Exception\LogicException('Version mismatch: file ' . $inputFile . ' specifies version ' . $configurationVersion . ' but file ' . $overrideFile . ' uses version ' . $overrideVersion);
+                throw new Console\Exception\LogicException(sprintf('Version mismatch: file "%s" specifies version "%s" but file "%s" uses version "%s"', $inputFile, $configurationVersion, $overrideFile, $overrideVersion));
             }
 
             $configuration = array_merge_recursive($configuration, $override);
@@ -86,7 +87,8 @@ $application->register('render')
 
         $graph = applyGraphvizStyle(
             createGraph($services, $volumes, $networks, $input->getOption('no-volumes') === false, $inputFile),
-            $input->getOption('horizontal')
+            $input->getOption('horizontal'),
+            $input->getOption('background')
         );
 
         switch ($outputFormat) {

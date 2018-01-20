@@ -1,5 +1,6 @@
 # `1.2.0` (unreleased)
 
+* Add the `--background` option to set the graph's background color
 * Versions correctly merged and checked
 
 # `1.1.0`

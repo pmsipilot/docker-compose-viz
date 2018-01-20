@@ -95,14 +95,16 @@ function createGraph(array $services, array $volumes, array $networks, bool $wit
 /**
  * @public
  *
- * @param Graph $graph      Input graph
- * @param bool  $horizontal Display a horizontal graph
+ * @param Graph  $graph      Input graph
+ * @param bool   $horizontal Display a horizontal graph
+ * @param string $horizontal Background color (any hex color or 'transparent')
  *
  * @return Graph A copy of the input graph with style attributes
  */
-function applyGraphvizStyle(Graph $graph, bool $horizontal) : Graph
+function applyGraphvizStyle(Graph $graph, bool $horizontal, string $background) : Graph
 {
     $graph = $graph->createGraphClone();
+    $graph->setAttribute('graphviz.graph.bgcolor', $background);
     $graph->setAttribute('graphviz.graph.pad', '0.5');
     $graph->setAttribute('graphviz.graph.ratio', 'fill');
 
