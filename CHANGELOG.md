@@ -1,4 +1,8 @@
-# `1.1.0` (unreleased)
+# `1.2.0` (unreleased)
+
+* Versions correctly merged and checked
+
+# `1.1.0`
 
 * Display `depends_on` conditions
 * Handle conditions in `depends_on`
