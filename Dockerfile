@@ -1,7 +1,7 @@
 FROM php:7.1-alpine
 
 RUN apk update && \
-    apk add graphviz ttf-dejavu && \
+    apk add graphviz ttf-dejavu feh xdg-utils file && \
     rm -rf \
         /var/cache/apk/* \
         /tmp/*
