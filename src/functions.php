@@ -330,10 +330,10 @@ function makeVerticesAndEdges(Graph $graph, array $services, array $volumes, arr
 
         if (false === ((bool) ($flags & WITHOUT_PORTS))) {
             foreach ($definition['ports'] ?? [] as $port) {
-                list($host, $container, $proto) = explodeMapping($port);
+                list($target, $host, $container, $proto) = explodePortMapping($port);
 
                 addRelation(
-                    addPort($graph, (int) $host, $proto),
+                    addPort($graph, (int) $host, $proto, $target),
                     $graph->getVertex($service),
                     'ports',
                     $host !== $container ? $container : null
@@ -390,13 +390,15 @@ function addService(Graph $graph, string $service, string $type = null)
  *
  * @return Vertex
  */
-function addPort(Graph $graph, int $port, string $proto = null)
+function addPort(Graph $graph, int $port, string $proto = null, string $target = null)
 {
-    if (true === $graph->hasVertex($port)) {
-        return $graph->getVertex($port);
+    $target = $target ? $target.':' : null;
+
+    if (true === $graph->hasVertex($target.$port)) {
+        return $graph->getVertex($target.$port);
     }
 
-    $vertex = $graph->createVertex($port);
+    $vertex = $graph->createVertex($target.$port);
     $vertex->setAttribute('docker_compose.type', 'port');
     $vertex->setAttribute('docker_compose.proto', $proto ?: 'tcp');
 
@@ -494,7 +496,7 @@ function addRelation(Vertex $from, Vertex $to, string $type, string $alias = nul
  *
  * @param string $mapping A docker mapping (<from>[:<to>])
  *
- * @return array An 2 items array containing the parts of the mapping.
+ * @return array An 2 or 3 items array containing the parts of the mapping.
  *               If the mapping does not specify a second part, the first one will be repeated
  */
 function explodeMapping($mapping): array
@@ -509,4 +511,31 @@ function explodeMapping($mapping): array
     }
 
     return [$parts[0], $subparts[0], $subparts[1] ?? null];
+}
+
+/**
+ * @internal
+ *
+ * @param string $mapping A docker mapping (<from>[:<to>])
+ *
+ * @return array An 2 or 3 items array containing the parts of the mapping.
+ *               If the mapping does not specify a second part, the first one will be repeated
+ */
+function explodePortMapping($mapping): array
+{
+    $parts = explode(':', $mapping);
+
+    if (count($parts) < 3) {
+        $target = null;
+        $host = $parts[0];
+        $container = $parts[1] ?? $parts[0];
+    } else {
+        $target = $parts[0];
+        $host = $parts[1];
+        $container = $parts[2];
+    }
+
+    $subparts = array_values(array_filter(explode('/', $container)));
+
+    return [$target, $host, $subparts[0], $subparts[1] ?? null];
 }
