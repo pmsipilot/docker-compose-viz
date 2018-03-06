@@ -5,6 +5,7 @@ namespace PMSIpilot\DockerComposeViz;
 use Fhaculty\Graph\Edge;
 use Fhaculty\Graph\Graph;
 use Fhaculty\Graph\Vertex;
+use InvalidArgumentException;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
@@ -15,10 +16,6 @@ const WITHOUT_PORTS = 4;
 
 /**
  * @internal
- *
- * @param OutputInterface $output
- *
- * @return callable
  */
 function logger(OutputInterface $output): callable
 {
@@ -31,19 +28,17 @@ function logger(OutputInterface $output): callable
  * @public
  *
  * @param string $path Path to a YAML file
- *
- * @return array
  */
 function readConfiguration(string $path): array
 {
     if (false === file_exists($path)) {
-        throw new \InvalidArgumentException(sprintf('File "%s" does not exist', $path));
+        throw new InvalidArgumentException(sprintf('File "%s" does not exist', $path));
     }
 
     try {
         return Yaml::parse(file_get_contents($path));
     } catch (ParseException $exception) {
-        throw new \InvalidArgumentException(sprintf('File "%s" does not contain valid YAML', $path));
+        throw new InvalidArgumentException(sprintf('File "%s" does not contain valid YAML', $path), $exception->getCode(), $exception);
     }
 }
 
@@ -461,8 +456,6 @@ function addNetwork(Graph $graph, string $name, string $type = null)
  * @param string|null $alias         Alias associated to the linked element
  * @param bool|null   $bidirectional Biderectional or not
  * @param bool|null   $condition     Wether the alias represents a condition or not
- *
- * @return Edge\Directed
  */
 function addRelation(Vertex $from, Vertex $to, string $type, string $alias = null, bool $bidirectional = false, bool $condition = false): Edge\Directed
 {

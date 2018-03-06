@@ -19,7 +19,7 @@ describe('Reading configuration', function () {
 
     it('should report if YAML is invalid', function () {
         expect(function () {
-            readConfiguration(__DIR__.'/fixtures/read-configuration/invalid.json');
+            readConfiguration(__DIR__.'/fixtures/read-configuration/invalid.yml');
         })
             ->toThrow(new InvalidArgumentException());
     });
