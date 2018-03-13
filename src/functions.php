@@ -306,8 +306,14 @@ function makeVerticesAndEdges(Graph $graph, array $services, array $volumes, arr
             $serviceVolumes = [];
 
             foreach ($definition['volumes'] ?? [] as $volume) {
-                list($host, $container, $attr) = explodeMapping($volume);
-
+                if (is_array($volume)) {
+                    $host = $volume['source'];
+                    $container = $volume['target'];
+                    $attr = $volume['read_only'] ? 'ro' : '';
+                } else {
+                    list($host, $container, $attr) = explodeMapping($volume);
+                }
+                
                 $serviceVolumes[$container] = [$host, $attr];
             }
 
