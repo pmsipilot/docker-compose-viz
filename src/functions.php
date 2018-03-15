@@ -313,7 +313,7 @@ function makeVerticesAndEdges(Graph $graph, array $services, array $volumes, arr
                 } else {
                     list($host, $container, $attr) = explodeMapping($volume);
                 }
-                
+
                 $serviceVolumes[$container] = [$host, $attr];
             }
 
