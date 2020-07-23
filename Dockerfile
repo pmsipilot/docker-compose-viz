@@ -1,4 +1,16 @@
-FROM php:7.1-alpine
+FROM php:7.4-alpine as builder
+
+COPY composer.json /dcv/composer.json
+COPY composer.lock /dcv/composer.lock
+
+WORKDIR /dcv
+
+RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
+    php composer-setup.php && \
+    php -r "unlink('composer-setup.php');" && \
+    php composer.phar install --prefer-dist
+
+FROM php:7.4-alpine
 
 RUN apk update && \
     apk add graphviz ttf-dejavu && \
@@ -8,7 +20,7 @@ RUN apk update && \
 
 COPY bin/    /dcv/bin
 COPY src/    /dcv/src
-COPY vendor/ /dcv/vendor
+COPY --from=builder /dcv/vendor /dcv/vendor
 
 RUN chmod +x /dcv/bin/dcv
 

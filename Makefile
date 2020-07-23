@@ -24,17 +24,11 @@ clean:
 	rm -rf vendor/
 
 docker.lock: Dockerfile bin/entrypoint.sh vendor src/application.php src/functions.php
-	$(COMPOSER) dump-autoload --classmap-authoritative
 	$(DOCKER) build -t $(DCV_IMAGE_NAME) .
 	touch docker.lock
 
-ifndef COMPOSERFLAGS
 vendor: composer.lock
 	$(COMPOSER) install --prefer-dist
-else
-vendor: composer.lock
-	$(COMPOSER) update $(COMPOSERFLAGS)
-endif
 
 composer.lock: composer.json
 	$(COMPOSER) update $(COMPOSERFLAGS)
