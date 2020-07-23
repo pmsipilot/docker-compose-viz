@@ -11,8 +11,11 @@
 
 Considering the current working directory is where your `docker-compose.yml` file is located:
 
-```
+```bash
 docker run --rm -it --name dcv -v $(pwd):/input pmsipilot/docker-compose-viz render -m image docker-compose.yml
+
+# PowerShell
+docker run --rm -it --name dcv -v ${pwd}:/input pmsipilot/docker-compose-viz render -m image docker-compose.yml
 ```
 
 This will generate the `docker-compose.png` file in the current working directory.
