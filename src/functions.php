@@ -309,7 +309,7 @@ function makeVerticesAndEdges(Graph $graph, array $services, array $volumes, arr
                     $container = $volume['target'];
                     $attr = !empty($volume['read-only']) ? 'ro' : '';
                 } else {
-                    list($host, $container, $attr) = explodeMapping($volume);
+                    list($host, $container, $attr) = explodeVolumeMapping($volume);
                 }
 
                 $serviceVolumes[$container] = [$host, $attr];
@@ -506,13 +506,23 @@ function explodeMapping($mapping): array
     $parts = explode(':', $mapping);
     $parts[1] = $parts[1] ?? $parts[0];
 
-    $subparts = array_values(array_filter(explode('/', $parts[1])));
+    return [$parts[0], $parts[1]];
+}
 
-    if (count($subparts) > 2) {
-        $subparts = [$parts[1], $parts[2] ?? null];
-    }
+/**
+ * @internal
+ *
+ * @param string $mapping A docker mapping (<from>[:<to>])
+ *
+ * @return array An 2 or 3 items array containing the parts of the mapping.
+ *               If the mapping does not specify a second part, the first one will be repeated
+ */
+function explodeVolumeMapping($mapping): array
+{
+    $parts = explode(':', $mapping);
+    $parts[1] = $parts[1] ?? $parts[0];
 
-    return [$parts[0], $subparts[0], $subparts[1] ?? null];
+    return [$parts[0], $parts[1], $parts[2] ?? null];
 }
 
 /**
