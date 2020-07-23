@@ -1,0 +1,43 @@
+name: Test
+
+on:
+    push:
+        branches:
+            - master
+    pull_request:
+        branches:
+            - master
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+
+        steps:
+            -   uses: actions/checkout@v2
+
+            -   name: Validate composer.json
+                run: composer validate --ansi --strict
+
+            -   name: Cache Composer packages
+                id: composer-cache
+                uses: actions/cache@v2
+                with:
+                    path: vendor
+                    key: ${{ runner.os }}-node-${{ hashFiles('**/composer.lock') }}
+                    restore-keys: |
+                        ${{ runner.os }}-node-
+
+            -   name: Install dependencies
+                if: steps.composer-cache.outputs.cache-hit != 'true'
+                run: composer install --prefer-dist --no-progress --no-suggest
+
+            -   name: Unit tests
+                run: composer run ut
+
+            -   name: Coding style
+                run: composer run cst
+
+            -   name: Build and push Docker images
+                uses: docker/build-push-action@v1
+                with:
+                    push: false

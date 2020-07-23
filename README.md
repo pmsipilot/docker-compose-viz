@@ -1,7 +1,5 @@
 # `docker-compose-viz` 
 
-[![Build Status](https://img.shields.io/travis/pmsipilot/docker-compose-viz/master.svg?style=flat-square)](https://travis-ci.org/pmsipilot/docker-compose-viz)
-[![StyleCI](https://styleci.io/repos/65026022/shield)](https://styleci.io/repos/65026022)
 [![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/pmsipilot/docker-compose-viz.svg)](http://isitmaintained.com/project/pmsipilot/docker-compose-viz "Average time to resolve an issue")
 [![Percentage of issues still open](http://isitmaintained.com/badge/open/pmsipilot/docker-compose-viz.svg)](http://isitmaintained.com/project/pmsipilot/docker-compose-viz "Percentage of issues still open")
 [![Docker Stars](https://img.shields.io/docker/stars/pmsipilot/docker-compose-viz.svg?style=flat)](https://hub.docker.com/r/pmsipilot/docker-compose-viz/)

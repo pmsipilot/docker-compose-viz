@@ -226,7 +226,8 @@ function makeVerticesAndEdges(Graph $graph, array $services, array $volumes, arr
     if (false === ((bool) ($flags & WITHOUT_NETWORKS))) {
         foreach ($networks as $network => $definition) {
             addNetwork(
-                $graph, 'net: '.$network,
+                $graph,
+                'net: '.$network,
                 isset($definition['external']) && true === $definition['external'] ? 'external_network' : 'network'
             );
         }
@@ -237,7 +238,7 @@ function makeVerticesAndEdges(Graph $graph, array $services, array $volumes, arr
 
         if (isset($definition['extends'])) {
             if (isset($definition['extends']['file'])) {
-                $configuration = readConfiguration(dirname($path) . DIRECTORY_SEPARATOR . $definition['extends']['file']);
+                $configuration = readConfiguration(dirname($path).DIRECTORY_SEPARATOR.$definition['extends']['file']);
                 $extendedServices = fetchServices($configuration);
                 $extendedVolumes = fetchVolumes($configuration);
                 $extendedNetworks = fetchVolumes($configuration);

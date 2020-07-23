@@ -12,13 +12,13 @@ docker: docker.lock
 test: vendor unit cs
 
 unit: vendor
-	$(PHP) bin/kahlan --pattern='*.php' --reporter=verbose --persistent=false --cc=true
+	$(COMPOSER) run ut
 
 cs:
-	$(PHP) bin/php-cs-fixer fix --dry-run
+	$(COMPOSER) run cst
 
 fix-cs:
-	$(PHP) bin/php-cs-fixer fix
+	$(COMPOSER) run cs
 
 clean:
 	rm -rf vendor/

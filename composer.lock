@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b969fd3f88d63984295c01f8c964a703",
+    "content-hash": "883183cc51537213776e61c66e969e5a",
     "packages": [
         {
             "name": "clue/graph",
@@ -627,58 +627,6 @@
             "time": "2020-06-04T11:16:35+00:00"
         },
         {
-            "name": "crysalead/kahlan",
-            "version": "2.5.8",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/kahlan/kahlan.git",
-                "reference": "4fad70f5a81698fe6cae725b21bb08c4aa677788"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/kahlan/kahlan/zipball/4fad70f5a81698fe6cae725b21bb08c4aa677788",
-                "reference": "4fad70f5a81698fe6cae725b21bb08c4aa677788",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.4"
-            },
-            "bin": [
-                "bin/kahlan"
-            ],
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Kahlan\\": "src/"
-                },
-                "files": [
-                    "src/init.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "CrysaLEAD"
-                }
-            ],
-            "description": "Behavior-Driven Development (BDD) library.",
-            "keywords": [
-                "BDD",
-                "Behavior-Driven Development",
-                "Monkey Patching",
-                "TDD",
-                "mock",
-                "stub",
-                "testing",
-                "unit test"
-            ],
-            "abandoned": "kahlan/kahlan",
-            "time": "2016-09-29T01:40:20+00:00"
-        },
-        {
             "name": "doctrine/annotations",
             "version": "1.10.3",
             "source": {
@@ -899,6 +847,60 @@
             ],
             "description": "A tool to automatically fix PHP code style",
             "time": "2020-06-27T23:57:46+00:00"
+        },
+        {
+            "name": "kahlan/kahlan",
+            "version": "4.7.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/kahlan/kahlan.git",
+                "reference": "c529ef24201053ba76d3c8c3531acd76b629ce87"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/kahlan/kahlan/zipball/c529ef24201053ba76d3c8c3531acd76b629ce87",
+                "reference": "c529ef24201053ba76d3c8c3531acd76b629ce87",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.5"
+            },
+            "require-dev": {
+                "squizlabs/php_codesniffer": "^3.4"
+            },
+            "bin": [
+                "bin/kahlan"
+            ],
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Kahlan\\": "src/"
+                },
+                "files": [
+                    "src/functions.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "CrysaLEAD"
+                }
+            ],
+            "description": "The PHP Test Framework for Freedom, Truth and Justice.",
+            "keywords": [
+                "BDD",
+                "Behavior-Driven Development",
+                "Monkey Patching",
+                "TDD",
+                "mock",
+                "stub",
+                "testing",
+                "unit test"
+            ],
+            "time": "2020-04-25T21:27:19+00:00"
         },
         {
             "name": "paragonie/random_compat",
@@ -1718,7 +1720,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": [],
-    "prefer-stable": true,
+    "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
         "php": "^7.2"
