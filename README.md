@@ -179,4 +179,4 @@ digraph G {
 ## License
 
 The MIT License (MIT)
-Copyright (c) 2016 PMSIpilot
+Copyright ® 2020 PMSIpilot
