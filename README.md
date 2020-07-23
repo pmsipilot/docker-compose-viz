@@ -24,7 +24,7 @@ This will generate the `docker-compose.png` file in the current working director
 Before you start, make sure you have:
 
 * [Composer](https://getcomposer.org/doc/00-intro.md#installation-linux-unix-osx) installed,
-* [PHP 7](http://php.net/downloads.php#v7.0.9) installed,
+* [PHP 7.2](http://php.net/downloads.php#v7.2.32) (at least) installed,
 * GraphViz installed (see below for a guide on how to install it)
 
 ```
