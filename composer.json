@@ -9,8 +9,8 @@
         "graphp/graphviz": "^0.2"
     },
     "require-dev": {
-        "crysalead/kahlan": "^2.5.4",
-        "friendsofphp/php-cs-fixer": "^2"
+        "friendsofphp/php-cs-fixer": "^2",
+        "kahlan/kahlan": "^4.7"
     },
     "license": "MIT",
     "authors": [
@@ -25,7 +25,9 @@
             "PMSIpilot\\DockerComposeViz\\": "src/"
         }
     },
-    "config": {
-        "bin-dir": "bin/"
+    "scripts": {
+        "cs": "php-cs-fixer fix",
+        "cst": "php-cs-fixer fix --dry-run",
+        "ut": "kahlan --grep='*.php' --reporter=verbose --persistent=false"
     }
 }
