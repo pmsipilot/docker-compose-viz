@@ -236,15 +236,17 @@ function makeVerticesAndEdges(Graph $graph, array $services, array $volumes, arr
         addService($graph, $service);
 
         if (isset($definition['extends'])) {
-            $configuration = readConfiguration(dirname($path).DIRECTORY_SEPARATOR.$definition['extends']['file']);
-            $extendedServices = fetchServices($configuration);
-            $extendedVolumes = fetchVolumes($configuration);
-            $extendedNetworks = fetchVolumes($configuration);
+            if (isset($definition['extends']['file'])) {
+                $configuration = readConfiguration(dirname($path) . DIRECTORY_SEPARATOR . $definition['extends']['file']);
+                $extendedServices = fetchServices($configuration);
+                $extendedVolumes = fetchVolumes($configuration);
+                $extendedNetworks = fetchVolumes($configuration);
 
-            $graph = makeVerticesAndEdges($graph, $extendedServices, $extendedVolumes, $extendedNetworks, dirname($path).DIRECTORY_SEPARATOR.$definition['extends']['file'], $flags);
+                $graph = makeVerticesAndEdges($graph, $extendedServices, $extendedVolumes, $extendedNetworks, dirname($path).DIRECTORY_SEPARATOR.$definition['extends']['file'], $flags);
+            }
 
             addRelation(
-                 addService($graph, $definition['extends']['service']),
+                addService($graph, $definition['extends']['service']),
                 $graph->getVertex($service),
                 'extends'
             );
