@@ -176,6 +176,13 @@ digraph G {
 
 ![display renderer](resources/display.png)
 
+### Troubleshooting
+
+#### Getting "failed to open stream: Permission denied"?
+
+Make sure the target directory is writeable by the user in the Docker container.
+Or create a writeable directory first. See [workaround #41](https://github.com/pmsipilot/docker-compose-viz/issues/41#issuecomment-483384999)
+
 ## License
 
 The MIT License (MIT)
