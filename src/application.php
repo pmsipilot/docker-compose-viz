@@ -12,7 +12,8 @@ $application->register('render')
 
     ->addOption('override', null, Console\Input\InputOption::VALUE_REQUIRED, 'Tag of the override file to use', 'override')
     ->addOption('output-file', 'o', Console\Input\InputOption::VALUE_REQUIRED, 'Path to a output file (Only for "dot" and "image" output format)')
-    ->addOption('output-format', 'm', Console\Input\InputOption::VALUE_REQUIRED, 'Output format (one of: "dot", "image", "display")', 'display')
+    ->addOption('output-format', 'm', Console\Input\InputOption::VALUE_REQUIRED, 'Output format (one of: "dot", "image", "display", "graphviz")', 'display')
+    ->addOption('graphviz-output-format', null, Console\Input\InputOption::VALUE_REQUIRED, 'GraphViz Output format (see `man dot` for details)', 'svg')
     ->addOption('only', null, Console\Input\InputOption::VALUE_IS_ARRAY | Console\Input\InputOption::VALUE_REQUIRED, 'Display a graph only for a given services')
 
     ->addOption('force', 'f', Console\Input\InputOption::VALUE_NONE, 'Overwrites output file if it already exists')
@@ -39,7 +40,7 @@ $application->register('render')
         $outputFile = $input->getOption('output-file') ?: getcwd().DIRECTORY_SEPARATOR.'docker-compose.'.('dot' === $outputFormat ? $outputFormat : 'png');
         $onlyServices = $input->getOption('only');
 
-        if (false === in_array($outputFormat, ['dot', 'image', 'display'])) {
+        if (false === in_array($outputFormat, ['dot', 'image', 'display', 'graphviz'])) {
             throw new Console\Exception\InvalidArgumentException(sprintf('Invalid output format "%s". It must be one of "dot", "image" or "display".', $outputFormat));
         }
 
@@ -140,6 +141,13 @@ $application->register('render')
             case 'display':
                 $renderer = new GraphViz();
                 $renderer->display($graph);
+                break;
+
+            case 'graphviz':
+                $renderer = new GraphViz();
+                $format = $input->getOption('graphviz-output-format');
+
+                file_put_contents($outputFile, $renderer->setFormat($format)->createImageData($graph));
                 break;
         }
     });
