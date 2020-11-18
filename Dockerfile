@@ -13,7 +13,7 @@ RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" &&
 FROM php:7.4-alpine
 
 RUN apk update && \
-    apk add graphviz ttf-dejavu && \
+    apk add graphviz ttf-dejavu feh xdg-utils file && \
     rm -rf \
         /var/cache/apk/* \
         /tmp/*
