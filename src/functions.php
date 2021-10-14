@@ -241,7 +241,7 @@ function makeVerticesAndEdges(Graph $graph, array $services, array $volumes, arr
                 $configuration = readConfiguration(dirname($path).DIRECTORY_SEPARATOR.$definition['extends']['file']);
                 $extendedServices = fetchServices($configuration);
                 $extendedVolumes = fetchVolumes($configuration);
-                $extendedNetworks = fetchVolumes($configuration);
+                $extendedNetworks = fetchNetworks($configuration);
 
                 $graph = makeVerticesAndEdges($graph, $extendedServices, $extendedVolumes, $extendedNetworks, dirname($path).DIRECTORY_SEPARATOR.$definition['extends']['file'], $flags);
             }
