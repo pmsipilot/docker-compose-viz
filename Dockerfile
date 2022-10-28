@@ -18,8 +18,8 @@ RUN apk update && \
         /var/cache/apk/* \
         /tmp/*
 
-COPY bin/    /dcv/bin
-COPY src/    /dcv/src
+COPY bin/    /dcv/bin/
+COPY src/    /dcv/src/
 COPY --from=builder /dcv/vendor /dcv/vendor
 
 RUN chmod +x /dcv/bin/dcv
