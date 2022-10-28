@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PMSIpilot\DockerComposeViz;
 
 use Graphp\GraphViz\GraphViz;
@@ -8,22 +10,21 @@ use Symfony\Component\Console;
 $application = new Console\Application();
 
 $application->register('render')
-    ->addArgument('input-file', Console\Input\InputArgument::OPTIONAL, 'Path to a docker compose file', getcwd().DIRECTORY_SEPARATOR.'docker-compose.yml')
-
-    ->addOption('override', null, Console\Input\InputOption::VALUE_REQUIRED, 'Tag of the override file to use', 'override')
+    ->addArgument('input-file', Console\Input\InputArgument::OPTIONAL | Console\Input\InputArgument::IS_ARRAY, 'Path to a docker compose file', [getcwd() . DIRECTORY_SEPARATOR . 'docker-compose.yml'])
     ->addOption('output-file', 'o', Console\Input\InputOption::VALUE_REQUIRED, 'Path to a output file (Only for "dot" and "image" output format)')
     ->addOption('output-format', 'm', Console\Input\InputOption::VALUE_REQUIRED, 'Output format (one of: "dot", "image", "display", "graphviz")', 'display')
     ->addOption('graphviz-output-format', null, Console\Input\InputOption::VALUE_REQUIRED, 'GraphViz Output format (see `man dot` for details)', 'svg')
-    ->addOption('only', null, Console\Input\InputOption::VALUE_IS_ARRAY | Console\Input\InputOption::VALUE_REQUIRED, 'Display a graph only for a given services')
-
+    ->addOption('include', null, Console\Input\InputOption::VALUE_IS_ARRAY | Console\Input\InputOption::VALUE_REQUIRED, 'Display a graph only for given services')
+    ->addOption('exclude', null, Console\Input\InputOption::VALUE_IS_ARRAY | Console\Input\InputOption::VALUE_REQUIRED, 'Display a graph without the given services')
     ->addOption('force', 'f', Console\Input\InputOption::VALUE_NONE, 'Overwrites output file if it already exists')
     ->addOption('no-volumes', null, Console\Input\InputOption::VALUE_NONE, 'Do not display volumes')
     ->addOption('no-networks', null, Console\Input\InputOption::VALUE_NONE, 'Do not display networks')
     ->addOption('no-ports', null, Console\Input\InputOption::VALUE_NONE, 'Do not display ports')
+    ->addOption('no-secrets', null, Console\Input\InputOption::VALUE_NONE, 'Do not display secrets')
+    ->addOption('no-configs', null, Console\Input\InputOption::VALUE_NONE, 'Do not display configs')
     ->addOption('horizontal', 'r', Console\Input\InputOption::VALUE_NONE, 'Display a horizontal graph')
     ->addOption('ignore-override', null, Console\Input\InputOption::VALUE_NONE, 'Ignore override file')
     ->addOption('background', null, Console\Input\InputOption::VALUE_REQUIRED, 'Set the graph background color', '#ffffff')
-
     ->setCode(function (Console\Input\InputInterface $input, Console\Output\OutputInterface $output) {
         $backgroundColor = $input->getOption('background');
 
@@ -32,15 +33,15 @@ $application->register('render')
         }
 
         $logger = logger($output);
-        $inputFile = $input->getArgument('input-file');
-        $inputFileExtension = pathinfo($inputFile, PATHINFO_EXTENSION);
-        $overrideFile = dirname($inputFile).DIRECTORY_SEPARATOR.basename($inputFile, '.'.$inputFileExtension).'.'.$input->getOption('override').'.'.$inputFileExtension;
+        $inputFiles = $input->getArgument('input-file');
+
 
         $outputFormat = $input->getOption('output-format');
-        $outputFile = $input->getOption('output-file') ?: getcwd().DIRECTORY_SEPARATOR.'docker-compose.'.('dot' === $outputFormat ? $outputFormat : 'png');
-        $onlyServices = $input->getOption('only');
+        $outputFile = $input->getOption('output-file') ?: getcwd() . DIRECTORY_SEPARATOR . 'docker-compose.' . ('dot' === $outputFormat ? $outputFormat : 'png');
+        $includeServices = $input->getOption('include');
+        $excludeServices = $input->getOption('exclude');
 
-        if (false === in_array($outputFormat, ['dot', 'image', 'display', 'graphviz'])) {
+        if (false === in_array($outputFormat, ['dot', 'image', 'display', 'graphviz'], true)) {
             throw new Console\Exception\InvalidArgumentException(sprintf('Invalid output format "%s". It must be one of "dot", "image" or "display".', $outputFormat));
         }
 
@@ -54,24 +55,9 @@ $application->register('render')
             }
         }
 
-        $logger(sprintf('Reading <comment>configuration</comment> from <info>"%s"</info>', $inputFile));
-        $configuration = readConfiguration($inputFile);
-        $configurationVersion = (string) ($configuration['version'] ?? 1);
-
-        if (!$input->getOption('ignore-override') && file_exists($overrideFile)) {
-            $logger(sprintf('Reading <comment>override</comment> from <info>"%s"</info>', $overrideFile));
-            $override = readConfiguration($overrideFile);
-            $overrideVersion = (string) ($override['version'] ?? 1);
-
-            if ($configurationVersion !== $overrideVersion) {
-                throw new Console\Exception\LogicException(sprintf('Version mismatch: file "%s" specifies version "%s" but file "%s" uses version "%s"', $inputFile, $configurationVersion, $overrideFile, $overrideVersion));
-            }
-
-            $configuration = array_merge_recursive($configuration, $override);
-
-            $logger(sprintf('Configuration <comment>version</comment> is <info>"%s"</info>', $configurationVersion), Console\Output\OutputInterface::VERBOSITY_VERY_VERBOSE);
-            $configuration['version'] = $configurationVersion;
-        }
+        $files = findConfigurationFiles($input->getOption('ignore-override'), ...$inputFiles);
+        $logger(sprintf('Reading <comment>configuration</comment> from <info>"%s"</info>', implode(', ', $files)));
+        $configuration = readConfigurations(...$files);
 
         $logger('Fetching <comment>services</comment>');
         $services = fetchServices($configuration);
@@ -85,22 +71,20 @@ $application->register('render')
         $networks = fetchNetworks($configuration);
         $logger(sprintf('Found <info>%d</info> <comment>networks</comment>', count($networks)), Console\Output\OutputInterface::VERBOSITY_VERY_VERBOSE);
 
-        if ([] !== $onlyServices) {
-            $logger(sprintf('Only <info>%s</info> <comment>services</comment> will be displayed', implode(', ', $onlyServices)));
+        $logger('Fetching <comment>configs</comment>');
+        $configs = fetchConfigs($configuration);
+        $logger(sprintf('Found <info>%d</info> <comment>configs</comment>', count($configs)), Console\Output\OutputInterface::VERBOSITY_VERY_VERBOSE);
 
-            $intersect = array_intersect($onlyServices, array_keys($services));
+        $logger('Fetching <comment>secrets</comment>');
+        $secrets = fetchSecrets($configuration);
+        $logger(sprintf('Found <info>%d</info> <comment>secrets</comment>', count($secrets)), Console\Output\OutputInterface::VERBOSITY_VERY_VERBOSE);
 
-            if ($intersect !== $onlyServices) {
-                throw new Console\Exception\InvalidArgumentException(sprintf('The following services do not exist: "%s"', implode('", "', array_diff($onlyServices, $intersect))));
-            }
+        if ([] !== $includeServices) {
+            $logger(sprintf('Only <info>%s</info> <comment>services</comment> will be displayed', implode(', ', $includeServices)));
+        }
 
-            $services = array_filter(
-                $services,
-                function ($service) use ($onlyServices) {
-                    return in_array($service, $onlyServices);
-                },
-                ARRAY_FILTER_USE_KEY
-            );
+        if ([] !== $excludeServices) {
+            $logger(sprintf('Services <info>%s</info> will not be displayed', implode(', ', $excludeServices)));
         }
 
         $flags = 0;
@@ -122,17 +106,53 @@ $application->register('render')
             $flags |= WITHOUT_PORTS;
         }
 
+        if (true === $input->getOption('no-secrets')) {
+            $logger('<comment>Secrets</comment> will not be displayed');
+
+            $flags |= WITHOUT_SECRETS;
+        }
+
+        if (true === $input->getOption('no-configs')) {
+            $logger('<comment>Configs</comment> will not be displayed');
+
+            $flags |= WITHOUT_CONFIGS;
+        }
+
         $logger('Rendering <comment>graph</comment>');
         $graph = applyGraphvizStyle(
-            createGraph($services, $volumes, $networks, $inputFile, $flags),
+            createGraph($services, $volumes, $networks, $configs, $secrets, $flags, $inputFiles[0]),
             $input->getOption('horizontal'),
             $input->getOption('background')
         );
 
+        if ([] !== $includeServices) {
+            foreach ($graph->getVertices() as $vertex) {
+                if ($vertex->getAttribute('docker_compose_viz.type') !== 'service') {
+                    continue;
+                }
+
+                if (!in_array($vertex->getId(), $includeServices, true)) {
+                    $vertex->destroy();
+                }
+            }
+        }
+
+        if ([] !== $excludeServices) {
+            foreach ($graph->getVertices() as $vertex) {
+                if ($vertex->getAttribute('docker_compose_viz.type') !== 'service') {
+                    continue;
+                }
+
+                if (in_array($vertex->getId(), $includeServices, true)) {
+                    $vertex->destroy();
+                }
+            }
+        }
+
         switch ($outputFormat) {
             case 'dot':
             case 'image':
-                $rendererClass = 'Graphp\GraphViz\\'.ucfirst($outputFormat);
+                $rendererClass = 'Graphp\GraphViz\\' . ucfirst($outputFormat);
                 $renderer = new $rendererClass();
 
                 file_put_contents($outputFile, $renderer->getOutput($graph));
@@ -152,4 +172,4 @@ $application->register('render')
         }
     });
 
-$application->run();
+return $application;

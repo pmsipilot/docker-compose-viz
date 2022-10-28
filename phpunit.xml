@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
+     colors="true"
+     testdox="true">
+    <coverage includeUncoveredFiles="true" processUncoveredFiles="true" pathCoverage="true">
+        <include>
+            <directory suffix=".php">src</directory>
+        </include>
+        <report>
+            <html outputDirectory="coverage"/>
+        </report>
+    </coverage>
+    <testsuite name="unit">
+        <directory>tests</directory>
+    </testsuite>
+</phpunit>
