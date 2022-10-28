@@ -5,26 +5,34 @@ on:
         branches:
             - '*'
 
+env:
+    REGISTRY: ghcr.io
+    IMAGE_NAME: ${{ github.repository }}
+
 jobs:
     test:
         runs-on: ubuntu-latest
 
         steps:
-            -   uses: actions/checkout@v2
+            - uses: actions/checkout@v3
 
-            -   name: Cache Composer packages
-                id: composer-cache
-                uses: actions/cache@v2
-                with:
-                    path: vendor
-                    key: ${{ runner.os }}-node-${{ hashFiles('**/composer.lock') }}
-                    restore-keys: |
-                        ${{ runner.os }}-node-
+            - name: Log in to the Container registry
+              uses: docker/login-action
+              with:
+                  registry: ${{ env.REGISTRY }}
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
 
-            -   name: Build and push Docker images
-                uses: docker/build-push-action@v1
-                with:
-                    #username: ${{ secrets.DOCKER_USERNAME }}
-                    #password: ${{ secrets.DOCKER_PASSWORD }}
-                    repository: ghcr.io/pmsipilot/docker-compose-viz
-                    tag_with_ref: true
+            - name: Extract metadata for Docker
+              id: metadata
+              uses: docker/metadata-action
+              with:
+                  images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+
+            - name: Build and push Docker image
+              uses: docker/build-push-action
+              with:
+                  context: .
+                  push: true
+                  tags: ${{ steps.meta.outputs.tags }}
+                  labels: ${{ steps.meta.outputs.labels }}
