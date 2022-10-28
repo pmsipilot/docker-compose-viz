@@ -26,7 +26,7 @@ clean:
 	rm -rf vendor/
 
 docker.lock: Dockerfile bin/entrypoint.sh vendor src/application.php src/functions.php
-	$(DOCKER) build -t $(DCV_IMAGE_NAME) .
+	$(DOCKER) build -t $(DCV_IMAGE_NAME) --no-cache .
 	touch docker.lock
 
 vendor/composer/installed.json: composer.lock
