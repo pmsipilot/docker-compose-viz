@@ -1,9 +1,9 @@
 name: Deploy
 
-#on:
-#    push:
-#        branches:
-#            - master
+on:
+    push:
+        branches:
+            - '*'
 
 jobs:
     test:
