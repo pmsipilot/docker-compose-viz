@@ -11,6 +11,8 @@ docker: docker.lock
 
 test: vendor unit cs
 
+vendor: vendor/composer/installed.json
+
 unit: vendor
 	$(COMPOSER) run ut
 
@@ -27,7 +29,7 @@ docker.lock: Dockerfile bin/entrypoint.sh vendor src/application.php src/functio
 	$(DOCKER) build -t $(DCV_IMAGE_NAME) .
 	touch docker.lock
 
-vendor: composer.lock
+vendor/composer/installed.json: composer.lock
 	$(COMPOSER) install --prefer-dist
 
 composer.lock: composer.json
