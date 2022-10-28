@@ -17,7 +17,7 @@ jobs:
             - uses: actions/checkout@v3
 
             - name: Log in to the Container registry
-              uses: docker/login-action
+              uses: docker/login-action@f054a8b53
               with:
                   registry: ${{ env.REGISTRY }}
                   username: ${{ github.actor }}
@@ -25,12 +25,12 @@ jobs:
 
             - name: Extract metadata for Docker
               id: metadata
-              uses: docker/metadata-action
+              uses: docker/metadata-action@98669ae86
               with:
                   images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
             - name: Build and push Docker image
-              uses: docker/build-push-action
+              uses: docker/build-push-action@ad44023a9
               with:
                   context: .
                   push: true
