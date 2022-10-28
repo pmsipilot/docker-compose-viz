@@ -1,4 +1,4 @@
-FROM php:7.4-alpine as builder
+FROM php:8.1-alpine as builder
 
 COPY composer.json /dcv/composer.json
 COPY composer.lock /dcv/composer.lock
@@ -10,7 +10,7 @@ RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" &&
     php -r "unlink('composer-setup.php');" && \
     php composer.phar install --prefer-dist
 
-FROM php:7.4-alpine
+FROM php:8.1-alpine
 
 RUN apk update && \
     apk add graphviz ttf-dejavu && \
