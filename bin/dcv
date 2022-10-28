@@ -1,0 +1,27 @@
+#!/usr/bin/env php
+<?php
+function resolve(array $components) : string
+{
+    return implode(DIRECTORY_SEPARATOR, $components);
+}
+
+require_once resolve(
+    [
+        __DIR__,
+        '..',
+        'vendor',
+        'autoload.php',
+    ]
+);
+
+$application = require_once resolve(
+    [
+        __DIR__,
+        '..',
+        'src',
+        'application.php',
+    ]
+);
+
+$application->run();
+?>
