@@ -1,4 +1,4 @@
-# `docker-compose-viz` 
+# `docker-compose-viz`
 
 [![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/pmsipilot/docker-compose-viz.svg)](http://isitmaintained.com/project/pmsipilot/docker-compose-viz "Average time to resolve an issue")
 [![Percentage of issues still open](http://isitmaintained.com/badge/open/pmsipilot/docker-compose-viz.svg)](http://isitmaintained.com/project/pmsipilot/docker-compose-viz "Percentage of issues still open")
@@ -6,14 +6,16 @@
 [![Docker Pulls](https://img.shields.io/docker/pulls/pmsipilot/docker-compose-viz.svg?style=flat)](https://hub.docker.com/r/pmsipilot/docker-compose-viz/)
 
 ## How to use
-     
+
 ### Docker
 
 Considering the current working directory is where your `docker-compose.yml` file is located:
 
-```bash
+```sh
 docker run --rm -it --name dcv -v $(pwd):/input pmsipilot/docker-compose-viz render -m image docker-compose.yml
+```
 
+```powershell
 # PowerShell
 docker run --rm -it --name dcv -v ${pwd}:/input pmsipilot/docker-compose-viz render -m image docker-compose.yml
 ```
@@ -28,24 +30,39 @@ Before you start, make sure you have:
 * [PHP 7.2](http://php.net/downloads.php#v7.2.32) (at least) installed,
 * GraphViz installed (see below for a guide on how to install it)
 
-```
+#### Self-Compiled
+
+```sh
 git clone https://github.com/pmsipilot/docker-compose-viz.git
 
 make vendor
-# Or
-composer install --prefer-dist 
+```
+
+#### Via Composer
+
+```sh
+composer install --prefer-dist
 
 bin/dcv
 ```
 
 #### Install GraphViz
 
-* On MacOS: `brew install graphviz`
-* On Debian: `sudo apt-get install graphviz`
+* On MacOS:
+
+   ```sh
+   brew install graphviz
+   ```
+
+* On Debian:
+
+   ```sh
+   sudo apt-get install graphviz
+   ```
 
 ## Usage
 
-```
+```sh
 Usage:
   render [options] [--] [<input-file>]
 
@@ -111,7 +128,7 @@ If we look at the link between port `2580` and `elk`, it reads as follow: "traff
 
 ### Extends
 
-Extended services (from `services.<service>.extends`) are displayed as components (just like normal services). The links between them and the extending services are 
+Extended services (from `services.<service>.extends`) are displayed as components (just like normal services). The links between them and the extending services are
 displayed as inverted arrows:
 
 ![extends](resources/extends.png)
@@ -126,7 +143,7 @@ Networks (from `networks.<network>`) are displayed as pentagons. The links betwe
 
 If we look at the link between `mysql` and the `global` network, it reads as follow: "`mysql` is known as `mysql`, `db` and `reldb` in the `global` network.
 
-The `legacy` network is an external so it's displayed as a grayed pentagone.
+The `legacy` network is an external so it's displayed as a grayed pentagon.
 
 ## Examples
 
