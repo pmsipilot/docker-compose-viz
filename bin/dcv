@@ -14,7 +14,7 @@ require_once resolve(
     ]
 );
 
-require_once resolve(
+$application = require_once resolve(
     [
         __DIR__,
         '..',
@@ -22,4 +22,6 @@ require_once resolve(
         'application.php',
     ]
 );
+
+$application->run();
 ?>

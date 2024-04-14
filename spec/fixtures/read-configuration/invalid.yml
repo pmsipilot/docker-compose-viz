@@ -1,4 +1,0 @@
-version
-services:
-    foo:
-        image: bar

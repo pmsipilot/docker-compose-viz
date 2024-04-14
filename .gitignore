@@ -1,7 +1,9 @@
-vendor/
-docker.lock
 bin/
+coverage/
+vendor/
+
 !bin/dcv
 !bin/entrypoint.sh
-.cache/
-.php_cs.cache
+.php-cs-fixer.cache
+.phpunit.result.cache
+docker.lock
