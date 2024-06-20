@@ -334,7 +334,14 @@ function makeVerticesAndEdges(Graph $graph, array $services, array $volumes, arr
 
         if (false === ((bool) ($flags & WITHOUT_PORTS))) {
             foreach ($definition['ports'] ?? [] as $port) {
-                list($target, $host, $container, $proto) = explodePortMapping($port);
+                if (is_array($port)) {
+                    $target = null;
+                    $host = $port['published'];
+                    $container = $port['target'];
+                    $proto = $port['protocol'] ?? null;
+                } else {
+                    list($target, $host, $container, $proto) = explodePortMapping($port);
+                }
 
                 addRelation(
                     addPort($graph, (int) $host, $proto, $target),
